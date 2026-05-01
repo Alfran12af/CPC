@@ -2,6 +2,12 @@
 
 
 
+
+%% Datos problema
+H = 600e3;                              % Altura orbita [m]
+m_PL = 20;                              % Massa de la payload [kg]
+Pc_max = 50e6;                          % Presion maxima de cámara [Pa]
+
 %% Datos asumidos
 
 % Velocity increment
@@ -9,17 +15,17 @@ S1.DeltaV = [];
 S2.DeltaV = [];
 S3.DeltaV = [];
 
-% Relacio estructural
+% Relacio estructural ( epsilon = ms/(ms+mp) )
 S1.epsilon = [];
 S2.epsilon = [];
 S3.epsilon = [];
 
-% Relacio de repartiment
+% Relacio de repartiment ( lambda = m_pl/(ms+mp) )
 S1.lambda = [];
 S2.lambda = [];
 S3.lambda = [];
 
-% Fraccio de payload
+% Fraccio de payload ( r = m_pl/mi = lambda/(1+lambda) )
 S1.PL_ratio = [];
 S2.PL_ratio = [];
 S3.PL_ratio = [];

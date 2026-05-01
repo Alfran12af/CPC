@@ -5,7 +5,20 @@
 
 
 % Entrada de datos
-DataDefinition;
+DataDefinition(S1.DeltaV, S1.m_ratio);
+
+RocketJustification(S1.);
+
+
+% Calculo teorico - ideal sin perdidas
+
+
+
+% "Simulacion con pérdidas"
+
+
+
+% Stage 3 - 
 
 
 
