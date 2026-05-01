@@ -55,8 +55,9 @@ gamma_air = 1.4;                        % Ratio of specific heats
 
 
 
+%% Lugar de lanzamiento
 
-
+latitud = 38 + 2/60;                    % Latitud de Murcia [deg]  -  Por definir
 
 
 
