@@ -7,7 +7,7 @@
 % Entrada de datos
 DataDefinition(S1.DeltaV, S1.m_ratio);
 
-RocketJustification(S1.);
+RocketJustification();
 
 
 % Calculo teorico - ideal sin perdidas
