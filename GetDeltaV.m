@@ -1,23 +1,32 @@
-function DV = GetDeltaV(phi, h)
-% Obtiene el impulso teorico necesario
-% INPUT:
-%       phi: latitud
-%       h: altura de la orbita final
-% OUTPUT: 
-%       DV: delta V
+function DV = GetDeltaV(lat, h)
+% GETDELTAV Computes ideal orbital Delta-V requirement
+%
+% INPUTS:
+%   lat : launch latitude [deg]
+%   h   : target orbital altitude [m]
+%
+% OUTPUT:
+%   DV  : ideal Delta-V [m/s] (no losses)
+%
+% DESCRIPTION:
+%   Computes the velocity required to reach a circular orbit,
+%   accounting for Earth's rotation benefit.
 
-R_T = 6371e3;                   % Radio de la Tierra [kg]
-G = 6.67e-11;                   % Constante gravitacional [N*m^2/kg^2]
-M = 5.975e24;                   % Masa de la Tierra [kg]
-T = 23*3600+56*60+4;            % Periodo de rotacion de la Tierra [s]
+% --- Constants ---
+R_E = 6371e3;            % Earth radius [m]
+mu  = 3.986e14;          % Earth gravitational parameter [m^3/s^2]
+T_E = 86164;             % Earth rotation period [s]
 
-v_orb = sqrt(G*M/(R_T+h));
-v_rot = 2*pi*R_T*cos(phi)/T;
+% --- Convert latitude to radians ---
+lat = deg2rad(lat);
 
+% --- Orbital velocity ---
+v_orb = sqrt(mu / (R_E + h));
+
+% --- Earth's rotational velocity contribution ---
+v_rot = (2*pi*R_E*cos(lat)) / T_E;
+
+% --- Ideal Delta-V ---
 DV = v_orb - v_rot;
-
-% Hay pérdidas por drag y por gravedad, hay que investigar sobre estas dos
-
-
 
 end

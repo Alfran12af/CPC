@@ -1,108 +1,76 @@
-function [pe,Te,rhoe,ae,g] = AtmosferaISA(h)
-% Valores de la atmosfera estandar internacional
+function [p, T, rho, a, g] = AtmosferaISA(h)
+% ATMOSFERAISA Computes ISA atmospheric properties
 %
-% INPUTS:
-%       h: altitud [m]
+% INPUT:
+%   h   : altitude [m]
+%
 % OUTPUTS:
-%       pe: presion [Pa]
-%       Te: Temperatura [K]
-%       rhoe: densidad [kg/m^3]
-%       ae: velocidad del sonido [m/s]
-%       g: gravedad [m/s^2]
+%   p   : pressure [Pa]
+%   T   : temperature [K]
+%   rho : density [kg/m^3]
+%   a   : speed of sound [m/s]
+%   g   : gravity [m/s^2]
 
-
-%Troposfera
-g0 = 9.807; %[m/s^2]
-Tsea = 288.15; %[K]
-psea = 101325; %[Pa]
-Raire = 287; %[Nm/kgK]
-Rt = 6371e3; %[m]
-g = g0/(1+h/Rt)^2; %[m/s^2]
+% --- Constants ---
+g0 = 9.807;          % [m/s^2]
+R  = 287;            % [J/(kg*K)]
 gamma = 1.4;
+R_E = 6371e3;        % [m]
 
-if 0 <= h && h<11000
- lambda = -0.00649; %[K/m]   
+% Gravity variation with altitude
+g = g0 / (1 + h/R_E)^2;
 
- Te = Tsea + lambda*h; %[K]
- pe = psea*(Te/Tsea)^(-g/(lambda*Raire)); %[Pa]
- rhoe = pe/(Raire*Te);%[kg/m^3]  
- 
- %Tropopausa
-elseif 11000 <= h && h<20000   
- T0 = 216.76; %[K]
- p0 = 22632; %[Pa]
- h0 = 11000; %[m]
- 
- Te = T0;
- pe = p0*exp(-(g/(Raire*T0))*(h-h0));%[Pa]
- rhoe = pe/(Raire*Te);%[kg/m^3] 
- 
- %Estratosfera 1
-elseif h >= 20000 && h<32000
- lambda = 0.001; %[K/m] 
- T0 = 216.76; %[K]
- p0 = 5474.9; %[Pa]
- %h0 = 20000; %[m]   
- 
- Te = T0 + lambda*h; %[K]
- pe = p0*(Te/T0)^(g/(lambda*Raire)); %[Pa]
- rhoe = pe/(Raire*Te);%[kg/m^3]  
- 
-  %Estratosfera 2
- elseif h >= 32000 && h<47000
- lambda = 0.0028; %[K/m] 
- T0 = 228.65; %[K]
- p0 = 868.02; %[Pa]
- %h0 = 32000; %[m]   
- 
- Te = T0 + lambda*h; %[K]
- pe = p0*(Te/T0)^(-g/(lambda*Raire)); %[Pa]
- rhoe = pe/(Raire*Te);%[kg/m^3]  
- 
-%Estratopausa
-elseif h >= 47000 && h<51000
- T0 = 270.65; %[K]
- p0 = 110.91; %[Pa]
- h0 = 47000; %[m]
- 
- Te = T0;
- pe = p0*exp(-(g/(Raire*T0))*(h-h0));%[Pa]
- rhoe = pe/(Raire*Te);%[kg/m^3] 
- 
-%Mesosfera 1
-elseif h >= 51000 && h<71000
- lambda = -0.0028; %[K/m] 
- T0 = 270.65; %[K]
- p0 = 66.939; %[Pa]
- %h0 = 51000; %[m]
- 
- Te = T0 + lambda*h; %[K]
- pe = p0*(Te/T0)^(-g/(lambda*Raire)); %[Pa]
- rhoe = pe/(Raire*Te);%[kg/m^3]  
- 
- %Mesosfera 2
- elseif h >= 71000 && h<84852
- lambda = -0.002; %[K/m]
- T0 = 214.65; %[K]
- p0 = 3.9564; %[Pa]
- %h0 = 71000; %[m]
- 
- Te = T0 + lambda*h; %[K]
- pe = p0*(Te/T0)^(-g/(lambda*Raire)); %[Pa]
- rhoe = pe/(Raire*Te);%[kg/m^3] 
- 
-elseif h>84852
- T0 = 186.87; %[K]
- p0 = 0.374; %[Pa]
- h0 = 84852; %[m]
- 
- Te = T0;
- pe = p0*exp(-(g/(Raire*T0))*(h-h0));%[Pa]
- rhoe = pe/(Raire*Te);%[kg/m^3] 
-
+% --- ISA layers ---
+if h < 11000
+    % Troposphere
+    lapse = -0.00649;
+    T = 288.15 + lapse*h;
+    p = 101325 * (T/288.15)^(-g/(lapse*R));
+    
+elseif h < 20000
+    % Tropopause
+    T = 216.65;
+    p = 22632 * exp(-g*(h-11000)/(R*T));
+    
+elseif h < 32000
+    % Stratosphere 1
+    lapse = 0.001;
+    T = 216.65 + lapse*(h-20000);
+    p = 5474.9 * (T/216.65)^(g/(lapse*R));
+    
+elseif h < 47000
+    % Stratosphere 2
+    lapse = 0.0028;
+    T = 228.65 + lapse*(h-32000);
+    p = 868.02 * (T/228.65)^(-g/(lapse*R));
+    
+elseif h < 51000
+    % Stratopause
+    T = 270.65;
+    p = 110.91 * exp(-g*(h-47000)/(R*T));
+    
+elseif h < 71000
+    % Mesosphere 1
+    lapse = -0.0028;
+    T = 270.65 + lapse*(h-51000);
+    p = 66.94 * (T/270.65)^(-g/(lapse*R));
+    
+elseif h < 84852
+    % Mesosphere 2
+    lapse = -0.002;
+    T = 214.65 + lapse*(h-71000);
+    p = 3.956 * (T/214.65)^(-g/(lapse*R));
+    
+else
+    % Above model range
+    T = 186.87;
+    p = 0.373 * exp(-g*(h-84852)/(R*T));
 end
 
-ae = sqrt(gamma*Raire*Te);
+% Density
+rho = p / (R*T);
+
+% Speed of sound
+a = sqrt(gamma * R * T);
 
 end
-
