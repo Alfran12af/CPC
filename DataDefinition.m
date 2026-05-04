@@ -1,69 +1,33 @@
-%% Definicion de los datos
+function data = DataDefinition()
+% DATADEFINITION Defines mission parameters and environmental constants
+%
+% OUTPUT:
+%   data : struct containing mission inputs and constants
 
+%% 1. MISSION PARAMETERS
 
+data.H        = 600e3;     % Target orbital altitude [m]
+data.m_payload = 20;       % Payload mass [kg]
+data.Pc_max   = 50e6;      % Maximum chamber pressure [Pa]
 
+%% 2. LAUNCH SITE
 
-%% Datos problema
-H = 600e3;                              % Altura orbita [m]
-m_PL = 20;                              % Massa de la payload [kg]
-Pc_max = 50e6;                          % Presion maxima de cámara [Pa]
+data.latitude = 38 + 2/60; % Launch latitude [deg] (Murcia)
 
-%% Datos asumidos
+%% 3. EARTH CONSTANTS
 
-% Velocity increment
-S1.DeltaV = [];
-S2.DeltaV = [];
-S3.DeltaV = [];
+data.R_E = 6371e3;         % Earth radius [m]
+data.g0  = 9.81;           % Standard gravity [m/s^2]
 
-% Relacio estructural ( epsilon = ms/(ms+mp) )
-S1.epsilon = [];
-S2.epsilon = [];
-S3.epsilon = [];
+%% 4. ISA ATMOSPHERE (SEA LEVEL)
 
-% Relacio de repartiment ( lambda = m_pl/(ms+mp) )
-S1.lambda = [];
-S2.lambda = [];
-S3.lambda = [];
+data.ISA.rho0 = 1.225;     % Air density [kg/m^3]
+data.ISA.T0   = 288.15;    % Temperature [K]
+data.ISA.P0   = 101325;    % Pressure [Pa]
 
-% Fraccio de payload ( r = m_pl/mi = lambda/(1+lambda) )
-S1.PL_ratio = [];
-S2.PL_ratio = [];
-S3.PL_ratio = [];
+data.ISA.a0   = 340.29;    % Speed of sound [m/s]
+data.ISA.mu0  = 1.7894e-5; % Dynamic viscosity [Pa·s]
+data.ISA.R    = 287.053;   % Gas constant [J/(kg·K)]
+data.ISA.gamma = 1.4;      % Heat capacity ratio
 
-
-%% Datos geométricos
-
-
-
-
-
-
-
-
-%% Standard values sea level
-ISA.rho0 = 1.225;                       % Air density sea level [kg/m^3]
-ISA.T0 = 15+273.15;                     % Ambient temperature sea level [K]
-ISA.P0 = 101325;                        % Sea level preassure [Pa]
-
-g0 = 9.0665;                            % Sea level gravity [m/s^2]
-v_sound = 340.29;                       % Sound speed at sea level [m/s]
-Visc = 1.7894e-5;                       % Sea level viscosity [Pa*s]
-M_air = 28.9644;                        % Sea level molar mass [kg/mol]
-R_air = 287.053;                        % Sea level air constant [J/(kg*K)]
-gamma_air = 1.4;                        % Ratio of specific heats
-
-
-
-
-%% Lugar de lanzamiento
-
-latitud = 38 + 2/60;                    % Latitud de Murcia [deg]  -  Por definir
-
-
-
-
-
-
-
-
-
+end
