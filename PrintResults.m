@@ -1,82 +1,174 @@
 function PrintResults(sol)
+% PRINTRESULTS Displays optimal launcher configuration
+%
+% INPUT:
+%   sol : optimal solution structure
 
-fprintf('\n===== OPTIMAL SOLUTION =====\n');
+%% =========================================================
+%% HEADER
+%% =========================================================
 
-%% --- GLOBAL RESULTS ---
-fprintf('Initial mass (m0): %.2f kg\n', sol.m0);
-fprintf('Payload mass     : %.2f kg\n', sol.stage3.m_payload);
-
-payload_fraction = sol.stage3.m_payload / sol.m0;
-fprintf('Payload fraction : %.3f\n\n', payload_fraction);
-
-%% --- DELTA-V ---
-fprintf('Delta-V distribution [m/s]:\n');
-fprintf('  Stage 1: %.2f\n', sol.DV(1));
-fprintf('  Stage 2: %.2f\n', sol.DV(2));
-fprintf('  Stage 3: %.2f\n\n', sol.DV(3));
-
-%% --- MASS RATIOS ---
-fprintf('Mass ratios:\n');
-fprintf('  Stage 1: %.2f\n', sol.mr(1));
-fprintf('  Stage 2: %.2f\n', sol.mr(2));
-fprintf('  Stage 3: %.2f\n\n', sol.mr(3));
-
-%% --- ISP ---
-fprintf('Specific impulse [s]:\n');
-fprintf('  Required:\n');
-fprintf('    S1: %.2f | S2: %.2f | S3: %.2f\n', sol.Isp_req);
-fprintf('  Available:\n');
-fprintf('    S1: %.2f | S2: %.2f | S3: %.2f\n\n', sol.Isp_real);
-
-%% --- ENGINE INFO ---
-fprintf('Engine configuration:\n');
-for i = 1:3
-    fprintf('  Stage %d: %s (%s) | Isp = %.1f s\n', ...
-        i, sol.engine(i).type, sol.engine(i).environment, sol.engine(i).Isp);
-end
 fprintf('\n');
+fprintf('=============================================\n');
+fprintf('         OPTIMAL LAUNCHER CONFIGURATION      \n');
+fprintf('=============================================\n');
 
-%% --- STAGE MASSES ---
-fprintf('Stage mass breakdown:\n');
+%% =========================================================
+%% GLOBAL RESULTS
+%% =========================================================
 
-fprintf('  Stage 1:\n');
-fprintf('    Initial mass  : %.2f kg\n', sol.stage1.mi);
-fprintf('    Propellant    : %.2f kg\n', sol.stage1.m_prop);
-fprintf('    Structure     : %.2f kg\n', sol.stage1.m_struct);
+fprintf('\n');
+fprintf('--------------- GLOBAL RESULTS --------------\n');
 
-fprintf('  Stage 2:\n');
-fprintf('    Initial mass  : %.2f kg\n', sol.stage2.mi);
-fprintf('    Propellant    : %.2f kg\n', sol.stage2.m_prop);
-fprintf('    Structure     : %.2f kg\n', sol.stage2.m_struct);
+fprintf('Initial mass (m0)      : %.2f kg\n', ...
+        sol.m0);
 
-fprintf('  Stage 3:\n');
-fprintf('    Initial mass  : %.2f kg\n', sol.stage3.mi);
-fprintf('    Propellant    : %.2f kg\n', sol.stage3.m_prop);
-fprintf('    Structure     : %.2f kg\n\n', sol.stage3.m_struct);
+fprintf('Payload mass           : %.2f kg\n', ...
+        sol.stage3.payload);
 
-%% --- TANK GEOMETRY ---
-fprintf('Tank geometry:\n');
+fprintf('Payload fraction       : %.4f\n', ...
+        sol.payload_fraction);
 
-% Stage 1 (solid)
-fprintf('  Stage 1 (Solid motor):\n');
-fprintf('    Diameter : %.2f m\n', sol.tank1.diameter);
-fprintf('    Length   : %.2f m\n', sol.tank1.length);
+fprintf('Total vehicle length   : %.2f m\n', ...
+        sol.total_length);
 
-% Stage 2 (liquid)
-fprintf('  Stage 2 (Liquid):\n');
-fprintf('    Ox tank diameter   : %.2f m\n', sol.tank2.D_ox);
-fprintf('    Fuel tank diameter : %.2f m\n', sol.tank2.D_fuel);
+%% =========================================================
+%% DELTA-V DISTRIBUTION
+%% =========================================================
 
-% Stage 3 (liquid)
-fprintf('  Stage 3 (Liquid):\n');
-fprintf('    Ox tank diameter   : %.2f m\n', sol.tank3.D_ox);
-fprintf('    Fuel tank diameter : %.2f m\n\n', sol.tank3.D_fuel);
+fprintf('\n');
+fprintf('------------- DELTA-V DISTRIBUTION ----------\n');
 
-%% --- TOTAL SIZE ESTIMATE ---
-total_length = sol.tank1.length + sol.tank2.total_length + sol.tank3.total_length;
+fprintf('Stage 1 : %.2f m/s\n', sol.DV(1));
+fprintf('Stage 2 : %.2f m/s\n', sol.DV(2));
+fprintf('Stage 3 : %.2f m/s\n', sol.DV(3));
 
-fprintf('Estimated total vehicle length: %.2f m\n', total_length);
+%% =========================================================
+%% ISP
+%% =========================================================
 
-fprintf('============================\n');
+fprintf('\n');
+fprintf('------------------- ISP ---------------------\n');
+
+fprintf('Stage 1 : %.2f s\n', sol.Isp(1));
+fprintf('Stage 2 : %.2f s\n', sol.Isp(2));
+fprintf('Stage 3 : %.2f s\n', sol.Isp(3));
+
+%% =========================================================
+%% MASS RATIOS
+%% =========================================================
+
+fprintf('\n');
+fprintf('--------------- MASS RATIOS -----------------\n');
+
+fprintf('Stage 1 : %.3f\n', sol.mr(1));
+fprintf('Stage 2 : %.3f\n', sol.mr(2));
+fprintf('Stage 3 : %.3f\n', sol.mr(3));
+
+%% =========================================================
+%% PROPELLANTS
+%% =========================================================
+
+fprintf('\n');
+fprintf('-------------- PROPELLANTS ------------------\n');
+
+fprintf('Stage 1 : %s\n', ...
+        sol.prop1.name);
+
+fprintf('Stage 2 : %s\n', ...
+        sol.prop2.name);
+
+fprintf('Stage 3 : %s\n', ...
+        sol.prop3.name);
+
+%% =========================================================
+%% STAGE MASSES
+%% =========================================================
+
+fprintf('\n');
+fprintf('--------------- STAGE MASSES ----------------\n');
+
+%% ---------- Stage 1 ----------
+
+fprintf('\nStage 1\n');
+
+fprintf('Initial mass      : %.2f kg\n', ...
+        sol.stage1.mi);
+
+fprintf('Propellant mass   : %.2f kg\n', ...
+        sol.stage1.m_prop);
+
+fprintf('Structural mass   : %.2f kg\n', ...
+        sol.stage1.m_struct);
+
+%% ---------- Stage 2 ----------
+
+fprintf('\nStage 2\n');
+
+fprintf('Initial mass      : %.2f kg\n', ...
+        sol.stage2.mi);
+
+fprintf('Propellant mass   : %.2f kg\n', ...
+        sol.stage2.m_prop);
+
+fprintf('Structural mass   : %.2f kg\n', ...
+        sol.stage2.m_struct);
+
+%% ---------- Stage 3 ----------
+
+fprintf('\nStage 3\n');
+
+fprintf('Initial mass      : %.2f kg\n', ...
+        sol.stage3.mi);
+
+fprintf('Propellant mass   : %.2f kg\n', ...
+        sol.stage3.m_prop);
+
+fprintf('Structural mass   : %.2f kg\n', ...
+        sol.stage3.m_struct);
+
+%% =========================================================
+%% GEOMETRY
+%% =========================================================
+
+fprintf('\n');
+fprintf('------------------ GEOMETRY -----------------\n');
+
+%% ---------- Solid stage ----------
+
+fprintf('\nStage 1 Solid Motor\n');
+
+fprintf('Diameter          : %.2f m\n', ...
+        sol.tank1.diameter);
+
+fprintf('Length            : %.2f m\n', ...
+        sol.tank1.length);
+
+%% ---------- Stage 2 ----------
+
+fprintf('\nStage 2 Tanks\n');
+
+fprintf('Tank diameter     : %.2f m\n', ...
+        sol.tank2.D);
+
+fprintf('Total tank length : %.2f m\n', ...
+        sol.tank2.total_length);
+
+%% ---------- Stage 3 ----------
+
+fprintf('\nStage 3 Tanks\n');
+
+fprintf('Tank diameter     : %.2f m\n', ...
+        sol.tank3.D);
+
+fprintf('Total tank length : %.2f m\n', ...
+        sol.tank3.total_length);
+
+%% =========================================================
+%% FOOTER
+%% =========================================================
+
+fprintf('\n');
+fprintf('=============================================\n');
 
 end

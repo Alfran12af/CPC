@@ -1,5 +1,5 @@
 function solid = SolidMotorSizing(m_prop, rho_prop, D)
-% SOLIDMOTORSIZING Computes cylindrical solid motor geometry
+% SOLIDMOTORSIZING Computes solid rocket motor geometry
 %
 % INPUTS:
 %   m_prop   : propellant mass [kg]
@@ -7,22 +7,52 @@ function solid = SolidMotorSizing(m_prop, rho_prop, D)
 %   D        : motor diameter [m]
 %
 % OUTPUT:
-%   solid : struct with geometry
+%   solid : solid motor geometry
 
-%% 1. Volume
+%% =========================================================
+%% VOLUMETRIC LOADING FACTOR
+%% =========================================================
+%
+% Accounts for:
+%   - internal port
+%   - insulation
+%   - casing
+%
 
-V = m_prop / rho_prop;
+eta_v = 0.85;
 
-%% 2. Cylinder geometry
+%% =========================================================
+%% PROPELLANT VOLUME
+%% =========================================================
 
-A = pi * (D/2)^2;   % cross-sectional area
+V_prop = m_prop / rho_prop;
 
-L = V / A;          % length
+%% =========================================================
+%% TOTAL MOTOR VOLUME
+%% =========================================================
 
-%% 3. Store results
+V_total = V_prop / eta_v;
 
-solid.volume   = V;
+%% =========================================================
+%% CYLINDRICAL GEOMETRY
+%% =========================================================
+
+A = pi * (D/2)^2;
+
+L = V_total / A;
+
+%% =========================================================
+%% STORE RESULTS
+%% =========================================================
+
+solid.volume_propellant = V_prop;
+
+solid.volume_total = V_total;
+
 solid.diameter = D;
-solid.length   = L;
+
+solid.length = L;
+
+solid.loading_factor = eta_v;
 
 end

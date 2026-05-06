@@ -1,33 +1,48 @@
-function data = DataDefinition()
-% DATADEFINITION Defines mission parameters and environmental constants
+function mission = DataDefinition()
+% DATADEFINITION Defines mission requirements
 %
 % OUTPUT:
-%   data : struct containing mission inputs and constants
+%   mission : mission definition structure
 
-%% 1. MISSION PARAMETERS
+%% =========================================================
+%% MISSION REQUIREMENTS
+%% =========================================================
 
-data.H        = 600e3;     % Target orbital altitude [m]
-data.m_payload = 20;       % Payload mass [kg]
-data.Pc_max   = 50e6;      % Maximum chamber pressure [Pa]
+% Target orbit altitude [m]
+mission.H = 600e3;
 
-%% 2. LAUNCH SITE
+% Payload mass [kg]
+mission.m_payload = 20;
 
-data.latitude = 38 + 2/60; % Launch latitude [deg] (Murcia)
+%% =========================================================
+%% LAUNCH SITE
+%% =========================================================
 
-%% 3. EARTH CONSTANTS
+% Launch latitude [deg]
+% Mediterranean coast (Murcia)
 
-data.R_E = 6371e3;         % Earth radius [m]
-data.g0  = 9.81;           % Standard gravity [m/s^2]
+mission.latitude = 38 + 2/60;
 
-%% 4. ISA ATMOSPHERE (SEA LEVEL)
+%% =========================================================
+%% EARTH CONSTANTS
+%% =========================================================
 
-data.ISA.rho0 = 1.225;     % Air density [kg/m^3]
-data.ISA.T0   = 288.15;    % Temperature [K]
-data.ISA.P0   = 101325;    % Pressure [Pa]
+mission.R_E = 6371e3;      % [m]
 
-data.ISA.a0   = 340.29;    % Speed of sound [m/s]
-data.ISA.mu0  = 1.7894e-5; % Dynamic viscosity [Pa·s]
-data.ISA.R    = 287.053;   % Gas constant [J/(kg·K)]
-data.ISA.gamma = 1.4;      % Heat capacity ratio
+mission.g0 = 9.81;         % [m/s^2]
+
+mission.mu = 3.986e14;     % [m^3/s^2]
+
+mission.T_E = 86164;       % [s]
+
+%% =========================================================
+%% MISSION LOSSES
+%% =========================================================
+
+% Typical launch losses
+
+mission.losses.gravity = 1500;   % [m/s]
+
+mission.losses.drag = 300;       % [m/s]
 
 end

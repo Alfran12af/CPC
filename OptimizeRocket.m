@@ -1,38 +1,76 @@
-function result = OptimizeRocket(params)
+function result = OptimizeRocket( ...
+    mission, ...
+    architecture, ...
+    params)
+
+% OPTIMIZEROCKET Finds optimal launcher configuration
+
+%% =========================================================
+%% GENERATE DESIGN SPACE
+%% =========================================================
+
+candidates = GenerateCandidates( ...
+                mission, ...
+                architecture, ...
+                params);
+
+%% =========================================================
+%% INITIALIZATION
+%% =========================================================
 
 best.m0 = inf;
-best.sol = [];
+best.solution = [];
 
-for f1 = params.frac1_range
-    for f2 = params.frac2_range
+valid_counter = 0;
+
+%% =========================================================
+%% EVALUATE CANDIDATES
+%% =========================================================
+
+for i = 1:length(candidates)
+    
+    candidate = candidates(i);
+    
+    %% =====================================================
+    %% EVALUATE CONFIGURATION
+    %% =====================================================
+    
+    solution = EvaluateConfiguration( ...
+                    candidate, ...
+                    mission, ...
+                    architecture, ...
+                    params);
+    
+    %% =====================================================
+    %% STORE BEST
+    %% =====================================================
+    
+    if solution.valid
         
-        f3 = 1 - f1 - f2;
-        if f3 <= 0
-            continue;
-        end
+        valid_counter = valid_counter + 1;
         
-        DV = params.DV_total * [f1 f2 f3];
-        
-        for mr1 = params.mr1_range
-            for mr2 = params.mr2_range
-                for mr3 = params.mr3_range
-                    
-                    mr = [mr1 mr2 mr3];
-                    
-                    sol = RocketModel(DV, mr, params);
-                    
-                    if sol.valid && sol.m0 < best.m0
-                        best.m0 = sol.m0;
-                        best.sol = sol;
-                    end
-                    
-                end
-            end
+        if solution.m0 < best.m0
+            
+            best.m0 = solution.m0;
+            best.solution = solution;
+            
         end
         
     end
+    
 end
 
-result = best.sol;
+%% =========================================================
+%% OUTPUT
+%% =========================================================
+
+result = best.solution;
+
+if params.verbose
+    
+    fprintf('\nValid configurations: %d\n', ...
+            valid_counter);
+    
+end
 
 end

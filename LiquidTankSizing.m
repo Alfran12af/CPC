@@ -1,47 +1,88 @@
-function tank = LiquidTankSizing(m_prop, prop)
-% LIQUIDTANKSIZING Computes spherical tank geometry for liquid propellants
+function tank = LiquidTankSizing( ...
+                    m_prop, ...
+                    prop, ...
+                    D)
+
+% LIQUIDTANKSIZING Computes liquid tank geometry
 %
 % INPUTS:
 %   m_prop : total propellant mass [kg]
-%   prop   : propellant struct (with rho_fuel, rho_ox, OF)
+%   prop   : propellant structure
+%   D      : tank diameter [m]
 %
 % OUTPUT:
-%   tank : struct with geometry and masses
+%   tank   : tank geometry structure
 
-%% 1. Mass split (O/F ratio)
+%% =========================================================
+%% MASS SPLIT
+%% =========================================================
 
-m_ox   = (prop.OF / (1 + prop.OF)) * m_prop;
-m_fuel = m_prop - m_ox;
+m_ox = ...
+    (prop.OF / (1 + prop.OF)) * m_prop;
 
-%% 2. Volumes
+m_fuel = ...
+    m_prop - m_ox;
 
-V_ox   = m_ox   / prop.rho_ox;
+%% =========================================================
+%% VOLUMES
+%% =========================================================
+
+V_ox = m_ox / prop.rho_ox;
+
 V_fuel = m_fuel / prop.rho_fuel;
 
-%% 3. Sphere geometry
+%% =========================================================
+%% GEOMETRY
+%% =========================================================
 
-% Volume of sphere: V = (4/3)*pi*r^3
-r_ox   = (3*V_ox   / (4*pi))^(1/3);
-r_fuel = (3*V_fuel / (4*pi))^(1/3);
+r = D / 2;
 
-D_ox   = 2*r_ox;
-D_fuel = 2*r_fuel;
+% Hemisphere volume
+V_hemi = (2/3) * pi * r^3;
 
-%% 4. Store results
+%% =========================================================
+%% OXIDIZER TANK
+%% =========================================================
 
-tank.m_ox   = m_ox;
+V_cyl_ox = max(V_ox - 2*V_hemi, 0);
+
+L_ox = V_cyl_ox / (pi*r^2);
+
+L_total_ox = L_ox + D;
+
+%% =========================================================
+%% FUEL TANK
+%% =========================================================
+
+V_cyl_fuel = max(V_fuel - 2*V_hemi, 0);
+
+L_fuel = V_cyl_fuel / (pi*r^2);
+
+L_total_fuel = L_fuel + D;
+
+%% =========================================================
+%% TOTAL LENGTH
+%% =========================================================
+
+total_length = ...
+    L_total_ox + ...
+    L_total_fuel;
+
+%% =========================================================
+%% STORE RESULTS
+%% =========================================================
+
+tank.D = D;
+
+tank.m_ox = m_ox;
 tank.m_fuel = m_fuel;
 
-tank.V_ox   = V_ox;
+tank.V_ox = V_ox;
 tank.V_fuel = V_fuel;
 
-tank.r_ox   = r_ox;
-tank.r_fuel = r_fuel;
+tank.L_ox = L_total_ox;
+tank.L_fuel = L_total_fuel;
 
-tank.D_ox   = D_ox;
-tank.D_fuel = D_fuel;
-
-% Total length if stacked (simple assumption)
-tank.total_length = D_ox + D_fuel;
+tank.total_length = total_length;
 
 end

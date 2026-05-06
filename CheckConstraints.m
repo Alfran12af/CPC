@@ -1,24 +1,108 @@
-function valid = CheckConstraints(s1, s2, s3, params)
+function valid = CheckConstraints( ...
+    stage1, ...
+    stage2, ...
+    stage3, ...
+    solution, ...
+    architecture)
+
+% CHECKCONSTRAINTS Validates launcher feasibility
+%
+% INPUTS:
+%   stage1        : stage 1 masses
+%   stage2        : stage 2 masses
+%   stage3        : stage 3 masses
+%   solution      : launcher solution
+%   architecture  : launcher architecture
+%
+% OUTPUT:
+%   valid         : boolean validity flag
+
+%% =========================================================
+%% INITIALIZATION
+%% =========================================================
 
 valid = true;
 
-% Positive masses
-if any([s1.mi s2.mi s3.mi] <= 0)
+%% =========================================================
+%% POSITIVE MASSES
+%% =========================================================
+
+if any([ ...
+        stage1.mi, ...
+        stage2.mi, ...
+        stage3.mi] <= 0)
+
     valid = false;
     return;
+
 end
 
-% Structural ratios sanity check
-if any([params.eps1 params.eps2 params.eps3] < 0.04) || ...
-   any([params.eps1 params.eps2 params.eps3] > 0.2)
+%% =========================================================
+%% STAGE VALIDITY
+%% =========================================================
+
+if ~stage1.valid || ...
+   ~stage2.valid || ...
+   ~stage3.valid
+
     valid = false;
     return;
+
 end
 
-% Payload consistency
-if abs(s3.m_payload - params.m_payload) > 1e-6
+%% =========================================================
+%% PAYLOAD FRACTION
+%% =========================================================
+
+if solution.payload_fraction < ...
+        architecture.min_payload_fraction
+
     valid = false;
     return;
+
+end
+
+%% =========================================================
+%% TOTAL LENGTH
+%% =========================================================
+
+if solution.total_length > ...
+        architecture.max_length
+
+    valid = false;
+    return;
+
+end
+
+%% =========================================================
+%% SLENDERNESS RATIO
+%% =========================================================
+
+% Approximate launcher diameter
+D = max([ ...
+    solution.tank1.diameter, ...
+    solution.tank2.D, ...
+    solution.tank3.D]);
+
+slenderness = solution.total_length / D;
+
+% Typical launchers: 10-20
+if slenderness > 25
+
+    valid = false;
+    return;
+
+end
+
+%% =========================================================
+%% GEOMETRY CHECK
+%% =========================================================
+
+if solution.total_length <= 0
+
+    valid = false;
+    return;
+
 end
 
 end

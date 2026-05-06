@@ -1,29 +1,58 @@
 function params = SetParams()
-% Defines global parameters and engineering assumptions
+% SETPARAMS Defines optimization parameters
+%
+% OUTPUT:
+%   params : optimization settings
+%
+% DESCRIPTION:
+%   Contains:
+%   - numerical parameters
+%   - search ranges
+%   - optimization discretization
 
-params.g0 = 9.81;              % [m/s^2]
+%% =========================================================
+%% PHYSICAL CONSTANTS
+%% =========================================================
 
-% --- Structural mass fractions (epsilon) ---
-params.eps1 = 0.10;            % Stage 1 (solid)
-params.eps2 = 0.08;            % Stage 2 (liquid PF)
-params.eps3 = 0.07;            % Stage 3 (liquid pump-fed)
+params.g0 = 9.81;    % [m/s^2]
 
-% --- Realistic Isp values ---
-params.Isp1 = 260;             % [s] solid (sea level)
-params.Isp2 = 300;             % [s] liquid PF (mid altitude)
-params.Isp3 = 340;             % [s] liquid pump-fed (vacuum)
+%% =========================================================
+%% DELTA-V DISTRIBUTION SEARCH SPACE
+%% =========================================================
+%
+% f1 + f2 + f3 = 1
+%
+% Typical launcher distributions:
+%   Stage 1 -> 40-60%
+%   Stage 2 -> 25-40%
+%   Stage 3 -> remaining
+%
 
-params.Isp_margin = 0.98;      % safety margin
+params.frac1_range = linspace(0.40,0.60,10);
 
-% --- Search ranges ---
-params.frac1_range = linspace(0.3,0.5,8);   % ΔV fractions
-params.frac2_range = linspace(0.2,0.4,8);
+params.frac2_range = linspace(0.20,0.40,10);
 
-params.mr1_range = linspace(3,6,6);
-params.mr2_range = linspace(3,7,6);
-params.mr3_range = linspace(3,8,6);
+%% =========================================================
+%% NUMERICAL SETTINGS
+%% =========================================================
 
-% --- Pressure constraint ---
-params.Pc_max = 50e6;          % [Pa]
+% Maximum number of stored solutions
+params.max_solutions = 1000;
+
+% Enable verbose mode
+params.verbose = true;
+
+%% =========================================================
+%% GEOMETRIC ASSUMPTIONS
+%% =========================================================
+
+% Initial reference diameter [m]
+params.reference_diameter = 0.5;
+
+%% =========================================================
+%% CONSTRAINTS TOLERANCES
+%% =========================================================
+
+params.mass_tolerance = 1e-6;
 
 end

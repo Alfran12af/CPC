@@ -1,44 +1,41 @@
 %% ROCKET MULTI-STAGE OPTIMIZATION MAIN
+
 clear;
 close all;
 clc;
 
-%% 1. LOAD INPUT DATA
-data = DataDefinition;
+%% 1. LOAD MISSION DATA
 
-%% 2. COMPUTE IDEAL DELTA-V
-DV_ideal = GetDeltaV(data.latitude, data.H);
+mission = DataDefinition();
 
-%% 3. INCLUDE LOSSES (gravity + drag)
-DV_gravity_loss = 1500;   % [m/s]
-DV_drag_loss    = 300;    % [m/s]
+%% 2. COMPUTE TOTAL DELTA-V
 
-DV_total = DV_ideal + DV_gravity_loss + DV_drag_loss;
+mission.DV_total = GetDeltaV(mission.latitude, ...
+                             mission.H);
 
-fprintf('Total Delta-V required: %.2f m/s\n', DV_total);
+fprintf('Total Delta-V required: %.2f m/s\n', ...
+        mission.DV_total);
 
-%% 4. DEFINE GLOBAL PARAMETERS
+%% 3. DEFINE VEHICLE ARCHITECTURE
+
+architecture = SetArchitecture();
+
+%% 4. DEFINE OPTIMIZATION PARAMETERS
+
 params = SetParams();
 
-% Override payload and Delta-V inside params
-params.m_payload = data.m_payload;
-params.DV_total  = DV_total;
+%% 5. START OPTIMIZATION
 
-%% 5. OPTIMIZATION PROCESS
-% Search for best configuration (Delta-V distribution + mass ratios)
 fprintf('\nStarting optimization...\n');
 
-result = OptimizeRocket(params);
+result = OptimizeRocket(mission, architecture, params);
 
 fprintf('Optimization completed.\n');
 
 %% 6. DISPLAY RESULTS
+
 PrintResults(result);
 
-%% 7. OPTIONAL: VISUALIZATION
-% (You can implement this later if needed)
+%% 7. OPTIONAL VISUALIZATION
+
 % PlotResults(result);
-
-
-
-
