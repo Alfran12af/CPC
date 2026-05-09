@@ -48,18 +48,18 @@ params.frac2_range = ...
 % Preliminary stage geometry assumptions
 %
 
-%% ---------------------------------------------------------
-%% TARGET STAGE ASPECT RATIO
-%% ---------------------------------------------------------
+%% =========================================================
+%% STAGE ASPECT RATIOS
+%% =========================================================
 %
-% Used in equivalent cylindrical sizing
-%
-% Typical values:
-%
-%   AR = L/D ≈ 4-6
+% Preliminary geometric assumptions
 %
 
-params.target_stage_AR = 5.5;
+params.AR_stage1 = 4.5;
+
+params.AR_stage2 = 5.5;
+
+params.AR_stage3 = 7.0;
 
 %% ---------------------------------------------------------
 %% VOLUMETRIC EFFICIENCY
@@ -187,8 +187,14 @@ fprintf('\n');
 fprintf('--------------- GEOMETRIC PARAMETERS --------------------\n');
 
 fprintf('\n');
-fprintf('   Target stage AR ............. %.2f\n', ...
-        params.target_stage_AR);
+fprintf('Stage 1 AR ........... %.2f\n', ...
+        params.AR_stage1);
+
+fprintf('Stage 2 AR ........... %.2f\n', ...
+        params.AR_stage2);
+
+fprintf('Stage 3 AR ........... %.2f\n', ...
+        params.AR_stage3);
 
 fprintf('   Solid volumetric efficiency . %.2f\n', ...
         params.solid_volumetric_efficiency);

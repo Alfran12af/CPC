@@ -136,7 +136,19 @@ end
 % Equivalent cylindrical stage
 %
 
-AR = params.target_stage_AR;
+if strcmp(stage_arch.name,'Stage 1')
+
+    AR = params.AR_stage1;
+
+elseif strcmp(stage_arch.name,'Stage 2')
+
+    AR = params.AR_stage2;
+
+elseif strcmp(stage_arch.name,'Stage 3')
+
+    AR = params.AR_stage3;
+    
+end
 
 %% =========================================================
 %% EQUIVALENT CYLINDRICAL GEOMETRY
