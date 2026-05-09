@@ -3,17 +3,21 @@ function solution = EvaluateConfiguration( ...
                     mission, ...
                     architecture, ...
                     params)
-
-% EVALUATECONFIGURATION Evaluates one launcher configuration
+% EVALUATECONFIGURATION Evaluates launcher configuration
 %
-% INPUTS:
-%   candidate     : candidate configuration
-%   mission       : mission data
-%   architecture  : launcher architecture
-%   params        : optimization parameters
+% DESCRIPTION:
 %
-% OUTPUT:
-%   solution      : launcher solution structure
+%   PHASE 1 -> Vehicle sizing
+%       - Tsiolkovsky
+%       - stage masses
+%       - geometry
+%
+%   PHASE 2 -> Propulsion sizing
+%       - thrust
+%       - mass flow
+%       - burn time
+%
+% ==========================================================
 
 %% =========================================================
 %% INITIALIZATION
@@ -24,7 +28,7 @@ solution.valid = false;
 g0 = params.g0;
 
 %% =========================================================
-%% EXTRACT CANDIDATE DATA
+%% EXTRACT CANDIDATE
 %% =========================================================
 
 DV = candidate.DV;
@@ -41,14 +45,11 @@ eps3 = candidate.eps3;
 %% ISP SELECTION
 %% =========================================================
 
-% Stage 1 -> sea level
 Isp1 = prop1.Isp_SL;
 
-% Stage 2 -> mixed atmosphere
 Isp2 = 0.5 * ...
        (prop2.Isp_SL + prop2.Isp_vac);
 
-% Stage 3 -> vacuum
 Isp3 = prop3.Isp_vac;
 
 Isp = [Isp1 Isp2 Isp3];
@@ -60,24 +61,27 @@ Isp = [Isp1 Isp2 Isp3];
 mr = exp(DV ./ (g0 .* Isp));
 
 %% =========================================================
-%% STAGE MASSES
+%% PAYLOAD
 %% =========================================================
 
 payload = mission.m_payload;
 
-% ---------- Stage 3 ----------
+%% =========================================================
+%% STAGE 3
+%% =========================================================
 
 stage3 = StageMass( ...
             mr(3), ...
             eps3, ...
             payload);
 
-% Check validity immediately
 if ~stage3.valid
     return;
 end
 
-% ---------- Stage 2 ----------
+%% =========================================================
+%% STAGE 2
+%% =========================================================
 
 stage2 = StageMass( ...
             mr(2), ...
@@ -88,7 +92,9 @@ if ~stage2.valid
     return;
 end
 
-% ---------- Stage 1 ----------
+%% =========================================================
+%% STAGE 1
+%% =========================================================
 
 stage1 = StageMass( ...
             mr(1), ...
@@ -106,51 +112,85 @@ end
 m0 = stage1.mi;
 
 %% =========================================================
-%% GEOMETRY
+%% STAGE GEOMETRY
 %% =========================================================
 
-% Reference diameters [m]
+geom1 = StageGeometry( ...
+            stage1, ...
+            prop1, ...
+            architecture.stage(1), ...
+            params);
 
-D1 = 0.50;
-D2 = 0.40;
-D3 = 0.30;
-
-%% ---------------- STAGE 1 ----------------
-
-tank1 = SolidMotorSizing( ...
-            stage1.m_prop, ...
-            prop1.rho_eff, ...
-            D1);
-
-%% ---------------- STAGE 2 ----------------
-
-tank2 = LiquidTankSizing( ...
-            stage2.m_prop, ...
+geom2 = StageGeometry( ...
+            stage2, ...
             prop2, ...
-            D2);
+            architecture.stage(2), ...
+            params);
 
-%% ---------------- STAGE 3 ----------------
-
-tank3 = LiquidTankSizing( ...
-            stage3.m_prop, ...
+geom3 = StageGeometry( ...
+            stage3, ...
             prop3, ...
-            D3);
+            architecture.stage(3), ...
+            params);
 
 %% =========================================================
 %% VEHICLE GEOMETRY
 %% =========================================================
 
 total_length = ...
-    tank1.length + ...
-    tank2.total_length + ...
-    tank3.total_length;
+    geom1.total_length + ...
+    geom2.total_length + ...
+    geom3.total_length;
+
+max_diameter = max([ ...
+    geom1.D ...
+    geom2.D ...
+    geom3.D]);
+
+global_slenderness = ...
+    total_length / max_diameter;
+
+%% =========================================================
+%% PAYLOAD FRACTION
+%% =========================================================
 
 payload_fraction = ...
     mission.m_payload / m0;
 
 %% =========================================================
+%% PROPULSION SIZING
+%% =========================================================
+
+engine1 = EngineSizing( ...
+                stage1, ...
+                prop1, ...
+                Isp1, ...
+                params.TW_stage1, ...
+                params);
+
+engine2 = EngineSizing( ...
+                stage2, ...
+                prop2, ...
+                Isp2, ...
+                params.TW_stage2, ...
+                params);
+
+engine3 = EngineSizing( ...
+                stage3, ...
+                prop3, ...
+                Isp3, ...
+                params.TW_stage3, ...
+                params);
+
+%% =========================================================
 %% STORE RESULTS
 %% =========================================================
+
+solution.valid = true;
+
+%% ---------------------------------------------------------
+%% PERFORMANCE
+%% ---------------------------------------------------------
 
 solution.m0 = m0;
 
@@ -163,44 +203,51 @@ solution.mr = mr;
 solution.payload_fraction = ...
     payload_fraction;
 
-solution.total_length = ...
-    total_length;
-
-%% ---------------- PROPELLANTS ----------------
-
-solution.prop1 = prop1;
-solution.prop2 = prop2;
-solution.prop3 = prop3;
-
-%% ---------------- STRUCTURAL FRACTIONS ----------------
-
-solution.eps1 = eps1;
-solution.eps2 = eps2;
-solution.eps3 = eps3;
-
-%% ---------------- STAGES ----------------
+%% ---------------------------------------------------------
+%% STAGES
+%% ---------------------------------------------------------
 
 solution.stage1 = stage1;
 solution.stage2 = stage2;
 solution.stage3 = stage3;
 
-%% ---------------- TANKS ----------------
+%% ---------------------------------------------------------
+%% GEOMETRY
+%% ---------------------------------------------------------
 
-solution.tank1 = tank1;
-solution.tank2 = tank2;
-solution.tank3 = tank3;
+solution.geom1 = geom1;
+solution.geom2 = geom2;
+solution.geom3 = geom3;
+
+solution.total_length = total_length;
+
+solution.max_diameter = max_diameter;
+
+solution.global_slenderness = ...
+    global_slenderness;
+
+%% ---------------------------------------------------------
+%% PROPELLANTS
+%% ---------------------------------------------------------
+
+solution.prop1 = prop1;
+solution.prop2 = prop2;
+solution.prop3 = prop3;
+
+%% ---------------------------------------------------------
+%% ENGINES
+%% ---------------------------------------------------------
+
+solution.engine1 = engine1;
+solution.engine2 = engine2;
+solution.engine3 = engine3;
 
 %% =========================================================
-%% CONSTRAINTS
+%% FINAL CONSTRAINT CHECK
 %% =========================================================
 
-valid = CheckConstraints( ...
-            stage1, ...
-            stage2, ...
-            stage3, ...
-            solution, ...
-            architecture);
-
-solution.valid = valid;
+solution.valid = CheckConstraints( ...
+                    solution, ...
+                    architecture);
 
 end

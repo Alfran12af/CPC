@@ -1,49 +1,14 @@
 function valid = CheckConstraints( ...
-    stage1, ...
-    stage2, ...
-    stage3, ...
-    solution, ...
-    architecture)
-
-% CHECKCONSTRAINTS Validates launcher feasibility
-%
-% INPUTS:
-%   stage1        : stage 1 masses
-%   stage2        : stage 2 masses
-%   stage3        : stage 3 masses
-%   solution      : launcher solution
-%   architecture  : launcher architecture
-%
-% OUTPUT:
-%   valid         : boolean validity flag
-
-%% =========================================================
-%% INITIALIZATION
-%% =========================================================
+                    solution, ...
+                    architecture)
 
 valid = true;
 
 %% =========================================================
-%% POSITIVE MASSES
+%% POSITIVE MASS
 %% =========================================================
 
-if any([ ...
-        stage1.mi, ...
-        stage2.mi, ...
-        stage3.mi] <= 0)
-
-    valid = false;
-    return;
-
-end
-
-%% =========================================================
-%% STAGE VALIDITY
-%% =========================================================
-
-if ~stage1.valid || ...
-   ~stage2.valid || ...
-   ~stage3.valid
+if solution.m0 <= 0
 
     valid = false;
     return;
@@ -75,19 +40,11 @@ if solution.total_length > ...
 end
 
 %% =========================================================
-%% SLENDERNESS RATIO
+%% MAXIMUM DIAMETER
 %% =========================================================
 
-% Approximate launcher diameter
-D = max([ ...
-    solution.tank1.diameter, ...
-    solution.tank2.D, ...
-    solution.tank3.D]);
-
-slenderness = solution.total_length / D;
-
-% Typical launchers: 10-20
-if slenderness > 25
+if solution.max_diameter > ...
+        architecture.max_diameter
 
     valid = false;
     return;
@@ -95,10 +52,29 @@ if slenderness > 25
 end
 
 %% =========================================================
-%% GEOMETRY CHECK
+%% GLOBAL SLENDERNESS
 %% =========================================================
 
-if solution.total_length <= 0
+if solution.global_slenderness > ...
+        architecture.global_slenderness_max
+
+    valid = false;
+    return;
+
+end
+
+%% =========================================================
+%% DIAMETER CASCADE
+%% =========================================================
+
+if solution.geom2.D > solution.geom1.D
+
+    valid = false;
+    return;
+
+end
+
+if solution.geom3.D > solution.geom2.D
 
     valid = false;
     return;
