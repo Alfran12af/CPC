@@ -69,13 +69,13 @@ params.AR_stage3 = 7.0;
 %
 %   - insulation
 %   - internal structures
-%   - unused volume
-%   - ullage
+%   - residual propellant
+%   - pressurization margins
 %
 
-params.solid_volumetric_efficiency = 0.85;
+params.solid_volumetric_efficiency = 0.9;
 
-params.liquid_ullage_factor = 1.10;
+params.liquid_volumetric_efficiency = 0.9;
 
 %% =========================================================
 %% ENGINE SECTION CORRELATIONS
@@ -199,8 +199,8 @@ fprintf('Stage 3 AR ........... %.2f\n', ...
 fprintf('   Solid volumetric efficiency . %.2f\n', ...
         params.solid_volumetric_efficiency);
 
-fprintf('   Liquid ullage factor ........ %.2f\n', ...
-        params.liquid_ullage_factor);
+fprintf('   Liquid volumetric efficiency  %.2f\n', ...
+        params.liquid_volumetric_efficiency);
 
 %% ---------------------------------------------------------
 %% ENGINE CORRELATIONS

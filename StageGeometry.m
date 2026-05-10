@@ -69,7 +69,7 @@ if strcmp(stage_arch.motor,'solid')
     %   - casing
     %
 
-    eta_v = ...
+    eta_v_solid = ...
         params.solid_volumetric_efficiency;
 
     %% -----------------------------------------------------
@@ -77,7 +77,7 @@ if strcmp(stage_arch.motor,'solid')
     %% -----------------------------------------------------
 
     V_total = ...
-        V_prop / eta_v;
+        V_prop / eta_v_solid;
 
 %% =========================================================
 %% LIQUID STAGES
@@ -117,15 +117,15 @@ else
     %   - pressurization systems
     %
 
-    ullage = ...
-        params.liquid_ullage_factor;
+    eta_v_liquid = ...
+        params.liquid_engine_factor;
 
     %% -----------------------------------------------------
     %% TOTAL VOLUME
     %% -----------------------------------------------------
 
     V_total = ...
-        ullage * (V_ox + V_fuel);
+        (V_ox + V_fuel) / eta_v_liquid;
 
 end
 
