@@ -40,7 +40,7 @@ mission.circular_orbit = true;
 
 mission.launch_site = 'Mediterranean Coast';
 
-mission.latitude = 38 + 2/60;      % [deg]
+mission.latitude = 43;      % [deg]
 
 %% =========================================================
 %% EARTH CONSTANTS

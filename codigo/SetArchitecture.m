@@ -23,9 +23,6 @@ function architecture = SetArchitecture()
 %
 % ==========================================================
 
-fprintf('\\n');
-fprintf('------------ LAUNCHER ARCHITECTURE ----------\\n');
-
 %% =========================================================
 %% GLOBAL CONFIGURATION
 %% =========================================================
@@ -91,7 +88,7 @@ architecture.stage(2).environment = ...
 %% ---------------------------------------------------------
 
 architecture.stage(2).epsilon_range = ...
-    linspace(0.08,0.16,5);
+    linspace(0.1,0.18,5);
 
 %% ---------------------------------------------------------
 %% ALLOWED PROPELLANTS
@@ -150,54 +147,39 @@ architecture.stage(3).candidates = ...
 %% TOTAL LAUNCHER LENGTH
 %% ---------------------------------------------------------
 
-architecture.max_length = 20;      % [m]
+architecture.max_length = 20;      % [m] %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% ---------------------------------------------------------
 %% MAXIMUM DIAMETER
 %% ---------------------------------------------------------
 
-architecture.max_diameter = 2.0;   % [m]
+architecture.max_diameter = 2.0;   % [m] %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% ---------------------------------------------------------
 %% GLOBAL SLENDERNESS
 %% ---------------------------------------------------------
-%
-% Typical launch vehicles:
-%
-%   L/D ≈ 10 - 20
-%
 
-architecture.global_slenderness_max = 20;
+architecture.global_slenderness_max = 20; %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% ---------------------------------------------------------
 %% STAGE ASPECT RATIO
 %% ---------------------------------------------------------
-%
-% Typical stage values:
-%
-%   AR = L/D ≈ 3 - 8
-%
 
-architecture.stage_AR_min = 3;
+architecture.stage_AR_min = 3; %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-architecture.stage_AR_max = 8;
+architecture.stage_AR_max = 8; %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% ---------------------------------------------------------
 %% DIAMETER DECAY
 %% ---------------------------------------------------------
-%
-% Prevents unrealistic stage transitions
-%
-% D(i+1)/D(i)
-%
 
-architecture.diameter_decay_min = 0.60;
+architecture.diameter_decay_min = 0.60; %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% =========================================================
 %% PAYLOAD FRACTION
 %% =========================================================
 
-architecture.min_payload_fraction = 0.005;
+architecture.min_payload_fraction = 0.005; %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% =========================================================
 %% DISPLAY SUMMARY

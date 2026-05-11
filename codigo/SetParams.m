@@ -55,11 +55,11 @@ params.frac2_range = ...
 % Preliminary geometric assumptions
 %
 
-params.AR_stage1 = 4.5;
+params.AR_stage1 = 4.5; %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-params.AR_stage2 = 5.5;
+params.AR_stage2 = 5.5; %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-params.AR_stage3 = 7.0;
+params.AR_stage3 = 7.0; %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% ---------------------------------------------------------
 %% VOLUMETRIC EFFICIENCY
