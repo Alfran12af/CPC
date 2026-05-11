@@ -48,18 +48,18 @@ params.frac2_range = ...
 % Preliminary stage geometry assumptions
 %
 
-%% =========================================================
-%% STAGE ASPECT RATIOS
-%% =========================================================
+%% ---------------------------------------------------------
+%% TARGET STAGE ASPECT RATIO
+%% ---------------------------------------------------------
 %
-% Preliminary geometric assumptions
+% Used in equivalent cylindrical sizing
+%
+% Typical values:
+%
+%   AR = L/D ≈ 4-6
 %
 
-params.AR_stage1 = 4.5;
-
-params.AR_stage2 = 5.5;
-
-params.AR_stage3 = 7.0;
+params.target_stage_AR = 5.5;
 
 %% ---------------------------------------------------------
 %% VOLUMETRIC EFFICIENCY
@@ -69,13 +69,13 @@ params.AR_stage3 = 7.0;
 %
 %   - insulation
 %   - internal structures
-%   - residual propellant
-%   - pressurization margins
+%   - unused volume
+%   - ullage
 %
 
-params.solid_volumetric_efficiency = 0.9;
+params.solid_volumetric_efficiency = 0.85;
 
-params.liquid_volumetric_efficiency = 0.9;
+params.liquid_ullage_factor = 1.10;
 
 %% =========================================================
 %% ENGINE SECTION CORRELATIONS
@@ -187,20 +187,14 @@ fprintf('\n');
 fprintf('--------------- GEOMETRIC PARAMETERS --------------------\n');
 
 fprintf('\n');
-fprintf('Stage 1 AR ........... %.2f\n', ...
-        params.AR_stage1);
-
-fprintf('Stage 2 AR ........... %.2f\n', ...
-        params.AR_stage2);
-
-fprintf('Stage 3 AR ........... %.2f\n', ...
-        params.AR_stage3);
+fprintf('   Target stage AR ............. %.2f\n', ...
+        params.target_stage_AR);
 
 fprintf('   Solid volumetric efficiency . %.2f\n', ...
         params.solid_volumetric_efficiency);
 
-fprintf('   Liquid volumetric efficiency  %.2f\n', ...
-        params.liquid_volumetric_efficiency);
+fprintf('   Liquid ullage factor ........ %.2f\n', ...
+        params.liquid_ullage_factor);
 
 %% ---------------------------------------------------------
 %% ENGINE CORRELATIONS
