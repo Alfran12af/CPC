@@ -39,7 +39,7 @@ params.frac1_range = ...
     linspace(0.4,0.6,20);
 
 params.frac2_range = ...
-    linspace(0.2,0.3,20);
+    linspace(0.2,0.4,20);
 
 %% =========================================================
 %% GEOMETRIC ASSUMPTIONS
