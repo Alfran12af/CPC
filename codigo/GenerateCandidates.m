@@ -66,7 +66,7 @@ for f1 = params.frac1_range
         %% DELTA-V PER STAGE
         %% -------------------------------------------------
 
-        DV = mission.DV_total * [f1 f2 f3];
+        DV = mission.DV_total * [f1 f2 f3] + [mission.DV_drag, 0, mission.DV_insertion];
 
         %% =================================================
         %% PROPELLANT DATABASES

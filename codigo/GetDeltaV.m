@@ -1,12 +1,15 @@
-function DV_total = GetDeltaV(latitude, h)
+function [DV_total, DV_drag, DV_insertion] = ...
+    GetDeltaV(latitude, h)
 % GETDELTAV Computes total launcher Delta-V requirement
 %
 % INPUTS:
-%   latitude : launch site latitude [deg]
-%   h        : target orbit altitude [m]
+%   latitude  : launch site latitude [deg]
+%   h         : target orbit altitude [m]
 %
 % OUTPUT:
-%   DV_total : total required Delta-V [m/s]
+%   DV_total      : total required Delta-V [m/s]
+%   DV_drag       : aerodynamic losses [m/s]
+%   DV_insertion  : orbital insertion losses [m/s]
 %
 % DESCRIPTION:
 %
@@ -16,6 +19,7 @@ function DV_total = GetDeltaV(latitude, h)
 %   2) Earth rotation contribution
 %   3) Gravity losses
 %   4) Aerodynamic drag losses
+%   5) Orbital insertion losses
 %
 %   Final result:
 %
@@ -40,7 +44,6 @@ T_E = 86164;           % Sidereal day [s]
 %% =========================================================
 % Circular orbit approximation
 
-
 r_orbit = R_E + h;
 
 v_orb = sqrt(mu / r_orbit);
@@ -53,6 +56,12 @@ latitude = deg2rad(latitude);
 
 v_rot = ...
     (2*pi*R_E*cos(latitude)) / T_E;
+
+%% =========================================================
+%% INSERTION ANGLE
+%% =========================================================
+
+alpha_deg = 51;
 
 %% =========================================================
 %% IDEAL DELTA-V
@@ -69,42 +78,54 @@ DV_ideal = v_orb - v_rot;
 %% =========================================================
 % Preliminary launcher estimations.
 
-DV_gravity = 1200;     % [m/s]
+DV_gravity = 300;     % [m/s]
 
-DV_drag = 300;         % [m/s]
+DV_drag = 1200;         % [m/s]
 
-DV_losses = ...
-    DV_gravity + DV_drag;
+%% =========================================================
+%% INSERTION LOSSES
+%% =========================================================
+
+DV_insertion =  ... 
+   v_orb * (1 - cosd(alpha_deg));
 
 %% =========================================================
 %% TOTAL DELTA-V
 %% =========================================================
 
-DV_total = DV_ideal + DV_losses;
+DV_total = ...
+    DV_ideal ...
+    + DV_gravity ...
+    + DV_drag ...
+    + DV_insertion;
 
 %% =========================================================
 %% DISPLAY RESULTS
 %% =========================================================
 
-fprintf('\\n');
-fprintf('------------- DELTA-V BREAKDOWN -------------\\n');
+fprintf('\n');
 
-fprintf('Orbital velocity       : %.2f m/s\\n', ...
+fprintf('------------- DELTA-V BREAKDOWN -------------\n');
+
+fprintf('Orbital velocity       : %.2f m/s\n', ...
         v_orb);
 
-fprintf('Earth rotation benefit : %.2f m/s\\n', ...
+fprintf('Earth rotation benefit : %.2f m/s\n', ...
         v_rot);
 
-fprintf('Ideal Delta-V          : %.2f m/s\\n', ...
+fprintf('Ideal Delta-V          : %.2f m/s\n', ...
         DV_ideal);
 
-fprintf('Gravity losses         : %.2f m/s\\n', ...
+fprintf('Gravity losses         : %.2f m/s\n', ...
         DV_gravity);
 
-fprintf('Aerodynamic losses     : %.2f m/s\\n', ...
+fprintf('Aerodynamic losses     : %.2f m/s\n', ...
         DV_drag);
 
-fprintf('Total Delta-V          : %.2f m/s\\n', ...
+fprintf('Insertion losses       : %.2f m/s\n', ...
+        DV_insertion);
+
+fprintf('Total Delta-V          : %.2f m/s\n', ...
         DV_total);
 
 end

@@ -36,10 +36,10 @@ params.g0 = 9.81;          % Standard gravity [m/s^2]
 % ==========================================================
 
 params.frac1_range = ...
-    linspace(0.40,0.60,10);
+    linspace(0.4,0.6,20);
 
 params.frac2_range = ...
-    linspace(0.20,0.40,10);
+    linspace(0.2,0.3,20);
 
 %% =========================================================
 %% GEOMETRIC ASSUMPTIONS
@@ -141,7 +141,7 @@ params.TW_stage1 = 1.4;
 
 params.TW_stage2 = 0.9;
 
-params.TW_stage3 = 0.5;
+params.TW_stage3 = 0.6;
 
 %% =========================================================
 %% DISPLAY SUMMARY

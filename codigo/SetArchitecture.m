@@ -62,8 +62,7 @@ architecture.stage(1).epsilon_range = ...
 
 architecture.stage(1).candidates = ...
 {
-    'HTPB',
-    'HTPB_AL'
+    'HTPB_AN_AL'
 };
 
 %% =========================================================
@@ -88,7 +87,7 @@ architecture.stage(2).environment = ...
 %% ---------------------------------------------------------
 
 architecture.stage(2).epsilon_range = ...
-    linspace(0.1,0.18,5);
+    linspace(0.2,0.25,5);
 
 %% ---------------------------------------------------------
 %% ALLOWED PROPELLANTS
@@ -96,9 +95,10 @@ architecture.stage(2).epsilon_range = ...
 
 architecture.stage(2).candidates = ...
 {
-    'LOX_ETHANOL',
-    'LOX_RP1',
-    'LOX_CH4'
+    'LOX_RP1_2',
+    'LOX_CH4_2',
+    'N2O4_MMH',
+    'N2O4_UH25'
 };
 
 %% =========================================================
@@ -131,9 +131,9 @@ architecture.stage(3).epsilon_range = ...
 
 architecture.stage(3).candidates = ...
 {
-    'LOX_CH4',
-    'LOX_LH2',
-    'LOX_RP1'
+    'LOX_RP1_3',
+    'LOX_CH4_3',
+    'LOX_LH2'
 };
 
 %% =========================================================
@@ -302,13 +302,6 @@ fprintf('   Maximum diameter ............ %.2f m\n', ...
 
 fprintf('   Maximum slenderness (L/D) ... %.2f\n', ...
         architecture.global_slenderness_max);
-
-fprintf('\n');
-fprintf('   Stage AR minimum ............ %.2f\n', ...
-        architecture.stage_AR_min);
-
-fprintf('   Stage AR maximum ............ %.2f\n', ...
-        architecture.stage_AR_max);
 
 fprintf('\n');
 fprintf('   Minimum diameter decay ...... %.2f\n', ...
