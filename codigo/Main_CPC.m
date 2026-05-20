@@ -63,10 +63,6 @@ fprintf('--------------- COMPUTING DELTA-V -----------------------\n');
                             mission.latitude, ...
                             mission.H);
 
-fprintf('\n');
-fprintf('   Total Delta-V required ...... %.2f m/s\n', ...
-        mission.DV_total);
-
 %% =========================================================
 %% 3. DEFINE FIXED LAUNCHER ARCHITECTURE
 %% =========================================================

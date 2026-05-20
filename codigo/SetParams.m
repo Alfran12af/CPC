@@ -39,7 +39,7 @@ params.frac1_range = ...
     linspace(0.4,0.6,20);
 
 params.frac2_range = ...
-    linspace(0.2,0.4,20);
+    linspace(0.3,0.5,20);
 
 %% =========================================================
 %% GEOMETRIC ASSUMPTIONS
@@ -139,9 +139,9 @@ params.geometry_tolerance = 1e-6;
 
 params.TW_stage1 = 1.4;
 
-params.TW_stage2 = 0.9;
+params.TW_stage2 = 1;
 
-params.TW_stage3 = 0.6;
+params.TW_stage3 = 0.7;
 
 %% =========================================================
 %% DISPLAY SUMMARY

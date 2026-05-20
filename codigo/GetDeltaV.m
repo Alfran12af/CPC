@@ -190,17 +190,7 @@ fprintf('K_insertion            : %.2f\n', ...
 
 fprintf('\n');
 
-fprintf('------------- STAGE LOSS ALLOCATION ---------\n');
-
-fprintf('Stage 1 additional DV  : %.2f m/s\n', ...
-        DV_drag);
-
-fprintf('Stage 3 additional DV  : %.2f m/s\n', ...
-        DV_insertion);
-
-fprintf('\n');
-
 fprintf('Total Delta-V          : %.2f m/s\n', ...
-        DV_total);
+        DV_total + DV_drag + DV_insertion);
 
 end

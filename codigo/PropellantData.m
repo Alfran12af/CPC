@@ -153,8 +153,8 @@ case 'LOX_RP1_3'
     prop.OF = 2.8499545;
 
     prop.Isp_SL = 245.44;
-
-    prop.Isp_vac = 374.39;
+ 
+    prop.Isp_vac = 333.39; % originalemnt 374.39
 
     prop.Tc = 3753.7615;
 
@@ -220,7 +220,7 @@ case 'LOX_CH4_3'
 
     prop.Isp_SL = 253.79;
 
-    prop.Isp_vac = 385.00;
+    prop.Isp_vac = 345.00; % Originalment: 385.00
 
     prop.Tc = 3605.2600;
 
