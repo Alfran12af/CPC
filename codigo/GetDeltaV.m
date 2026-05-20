@@ -26,7 +26,11 @@ function [DV_total, DV_drag, DV_insertion] = ...
 %       DV_total =
 %           DV_orbital
 %         - DV_rotation
-%         + DV_losses
+%         + DV_gravity
+%
+%   Drag and insertion losses are computed
+%   independently and later allocated to
+%   stage 1 and stage 3 respectively.
 %
 
 %% =========================================================
@@ -60,8 +64,10 @@ v_rot = ...
 %% =========================================================
 %% INSERTION ANGLE
 %% =========================================================
+% Residual orbital insertion angle
+% for preliminary trajectory estimation
 
-alpha_deg = 51;
+alpha_deg = 3;
 
 %% =========================================================
 %% IDEAL DELTA-V
@@ -76,28 +82,66 @@ DV_ideal = v_orb - v_rot;
 %% =========================================================
 %% ESTIMATED LOSSES
 %% =========================================================
-% Preliminary launcher estimations.
+% Preliminary launcher estimations
+% based on typical small launch vehicles.
 
-DV_gravity = 300;     % [m/s]
+DV_gravity = 1200;     % [m/s]
 
-DV_drag = 1200;         % [m/s]
+DV_drag = 300;         % [m/s]
 
 %% =========================================================
 %% INSERTION LOSSES
 %% =========================================================
+%
+% Simplified insertion loss estimation:
+%
+%   DV_insertion =
+%       V_orb * (1-cos(alpha))
+%
+% Small insertion angles are assumed
+% for preliminary launcher sizing.
+%
 
-DV_insertion =  ... 
-   v_orb * (1 - cosd(alpha_deg)) * 0.1;
+DV_insertion = ...
+    v_orb * (1 - cosd(alpha_deg));
+
+%% =========================================================
+%% SAFETY COEFFICIENTS
+%% =========================================================
+
+K_orbit = 1.10;
+
+K_drag = 1/1.50;
+
+K_gravity = 1.50;
+
+K_rotation = 1/1.10;
+
+K_insertion = 1.20;
+
+%% =========================================================
+%% SAFETY-ADJUSTED LOSSES
+%% =========================================================
+
+DV_drag = ...
+    DV_drag * K_drag;
+
+DV_insertion = ...
+    DV_insertion * K_insertion;
 
 %% =========================================================
 %% TOTAL DELTA-V
 %% =========================================================
+%
+% Drag and insertion losses are NOT included
+% in the global Delta-V because they are later
+% allocated directly to stage 1 and stage 3.
+%
 
 DV_total = ...
-    DV_ideal ...
-    + DV_gravity ...
-    + DV_drag ...
-    + DV_insertion;
+      DV_ideal   * K_orbit ...
+    + DV_gravity * K_gravity ...
+    - abs(v_rot) * K_rotation;
 
 %% =========================================================
 %% DISPLAY RESULTS
@@ -124,6 +168,37 @@ fprintf('Aerodynamic losses     : %.2f m/s\n', ...
 
 fprintf('Insertion losses       : %.2f m/s\n', ...
         DV_insertion);
+
+fprintf('\n');
+
+fprintf('------------- SAFETY COEFFICIENTS -----------\n');
+
+fprintf('K_orbit                : %.2f\n', ...
+        K_orbit);
+
+fprintf('K_drag                 : %.2f\n', ...
+        K_drag);
+
+fprintf('K_gravity              : %.2f\n', ...
+        K_gravity);
+
+fprintf('K_rotation             : %.2f\n', ...
+        K_rotation);
+
+fprintf('K_insertion            : %.2f\n', ...
+        K_insertion);
+
+fprintf('\n');
+
+fprintf('------------- STAGE LOSS ALLOCATION ---------\n');
+
+fprintf('Stage 1 additional DV  : %.2f m/s\n', ...
+        DV_drag);
+
+fprintf('Stage 3 additional DV  : %.2f m/s\n', ...
+        DV_insertion);
+
+fprintf('\n');
 
 fprintf('Total Delta-V          : %.2f m/s\n', ...
         DV_total);
