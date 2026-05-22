@@ -2,29 +2,26 @@ function result = OptimizeRocket( ...
                     mission, ...
                     architecture, ...
                     params)
-% OPTIMIZEROCKET Finds optimal launcher configuration
+% OPTIMIZEROCKET Performs launcher optimization
 %
 % INPUTS:
 %   mission      : mission structure
-%   architecture : launcher architecture
-%   params       : optimization settings
+%   architecture : launcher architecture structure
+%   params       : optimization parameters
 %
 % OUTPUT:
-%   result       : optimal launcher solution
-%
-% ==========================================================
+%   result       : optimal solution structure
 
 fprintf('\n');
-fprintf('=========================================================\n');
-fprintf('                    OPTIMIZATION                         \n');
-fprintf('=========================================================\n');
+fprintf('==========================================================================\n');
+fprintf('                            OPTIMIZATION                                  \n');
+fprintf('==========================================================================\n');
 
-%% =========================================================
-%% GENERATE DESIGN SPACE
-%% =========================================================
+%% ------------------------------------------------------------------------
+% Generate design space
+% -------------------------------------------------------------------------
 
-fprintf('\n');
-fprintf('---------------- GENERATING DESIGN SPACE ----------------\n');
+fprintf('\nGenerating candidate configurations...\n');
 
 candidates = GenerateCandidates( ...
                     mission, ...
@@ -33,40 +30,28 @@ candidates = GenerateCandidates( ...
 
 n_candidates = length(candidates);
 
-fprintf('\n');
-fprintf('   Total candidates generated ..... %d\n', ...
-        n_candidates);
+fprintf('   Total candidates .................. %d\n', ...
+    n_candidates);
 
-%% =========================================================
-%% INITIALIZATION
-%% =========================================================
+%% ------------------------------------------------------------------------
+% Initialization
+% -------------------------------------------------------------------------
 
-best_solution = [];
+best_solution  = [];
+best_m0        = inf;
 
-best_m0 = inf;
-
-valid_counter = 0;
-
+valid_counter   = 0;
 invalid_counter = 0;
 
-%% =========================================================
-%% EVALUATE CANDIDATES
-%% =========================================================
+fprintf('\nEvaluating configurations...\n');
 
-fprintf('\n');
-fprintf('---------------- EVALUATING CONFIGURATIONS --------------\n');
+%% ------------------------------------------------------------------------
+% Candidate evaluation
+% -------------------------------------------------------------------------
 
 for i = 1:n_candidates
 
-    %% -----------------------------------------------------
-    %% CURRENT CANDIDATE
-    %% -----------------------------------------------------
-
     candidate = candidates(i);
-
-    %% -----------------------------------------------------
-    %% EVALUATE CONFIGURATION
-    %% -----------------------------------------------------
 
     solution = EvaluateConfiguration( ...
                     candidate, ...
@@ -74,103 +59,118 @@ for i = 1:n_candidates
                     architecture, ...
                     params);
 
-    %% -----------------------------------------------------
-    %% INVALID CONFIGURATION
-    %% -----------------------------------------------------
+    %% Invalid solution
 
     if ~solution.valid
 
-        invalid_counter = ...
-            invalid_counter + 1;
-
+        invalid_counter = invalid_counter + 1;
         continue;
 
     end
 
-    %% -----------------------------------------------------
-    %% VALID CONFIGURATION
-    %% -----------------------------------------------------
+    %% Valid solution
 
-    valid_counter = ...
-        valid_counter + 1;
+    valid_counter = valid_counter + 1;
 
-    %% -----------------------------------------------------
-    %% CHECK OPTIMUM
-    %% -----------------------------------------------------
+    %% Progress display
+
+    if mod(i,100) == 0 || i == n_candidates
+
+        fprintf( ...
+            '   Progress: %6d / %6d | Valid: %5d | Best m0: %.2f kg\n', ...
+            i, ...
+            n_candidates, ...
+            valid_counter, ...
+            best_m0);
+
+    end
+
+    %% New optimum
 
     if solution.m0 < best_m0
 
         best_m0 = solution.m0;
-
         best_solution = solution;
 
-        if params.verbose
+        fprintf('\n');
+        fprintf('   New optimum found\n');
+        fprintf('   -------------------------------------------------------\n');
 
-            fprintf('\n');
-            fprintf('   New optimum found\n');
+        fprintf('      Candidate ID ................. %d\n', ...
+            i);
 
-            fprintf('      Initial mass .............. %.2f kg\n', ...
-                    best_m0);
+        fprintf('      Initial mass ................. %.2f kg\n', ...
+            best_m0);
 
-            fprintf('      Candidate ID .............. %d\n', ...
-                    i);
+        fprintf('      Payload fraction ............. %.4f\n', ...
+            solution.payload_fraction);
 
-        end
+        fprintf('      Propulsion configuration ..... %s | %s | %s\n', ...
+            solution.prop1.name, ...
+            solution.prop2.name, ...
+            solution.prop3.name);
+
+        fprintf('      Delta-V distribution ......... %.0f | %.0f | %.0f m/s\n', ...
+            solution.DV(1), ...
+            solution.DV(2), ...
+            solution.DV(3));
 
     end
 
 end
 
-%% =========================================================
-%% FINAL RESULTS
-%% =========================================================
-
-fprintf('\n');
-fprintf('---------------- OPTIMIZATION SUMMARY -------------------\n');
-
-fprintf('\n');
-fprintf('   Total candidates ............. %d\n', ...
-        n_candidates);
-
-fprintf('   Valid configurations ......... %d\n', ...
-        valid_counter);
-
-fprintf('   Invalid configurations ....... %d\n', ...
-        invalid_counter);
-
-%% =========================================================
-%% CHECK FEASIBILITY
-%% =========================================================
+%% ------------------------------------------------------------------------
+% Feasibility check
+% -------------------------------------------------------------------------
 
 if isempty(best_solution)
 
-    error(['No feasible launcher configuration ' ...
-           'was found.']);
+    error('No feasible launcher configuration was found.');
 
 end
 
-%% =========================================================
-%% OUTPUT
-%% =========================================================
+%% ------------------------------------------------------------------------
+% Final summary
+% -------------------------------------------------------------------------
 
 result = best_solution;
 
 fprintf('\n');
-fprintf('------------------- FINAL OPTIMUM -----------------------\n');
+fprintf('==========================================================================\n');
+fprintf('                         OPTIMIZATION SUMMARY                             \n');
+fprintf('==========================================================================\n');
+
+fprintf('   Total candidates ................. %d\n', ...
+    n_candidates);
+
+fprintf('   Valid configurations ............. %d\n', ...
+    valid_counter);
+
+fprintf('   Invalid configurations ........... %d\n', ...
+    invalid_counter);
 
 fprintf('\n');
-fprintf('   Optimization status .......... SUCCESS\n');
+fprintf('BEST CONFIGURATION\n');
+fprintf('--------------------------------------------------------------------------\n');
 
-fprintf('   Best initial mass ............ %.2f kg\n', ...
-        result.m0);
+fprintf('   Initial launcher mass ............ %.2f kg\n', ...
+    result.m0);
 
-fprintf('   Payload fraction ............. %.4f\n', ...
-        result.payload_fraction);
+fprintf('   Payload fraction ................. %.4f\n', ...
+    result.payload_fraction);
 
-fprintf('   Total launcher length ........ %.2f m\n', ...
-        result.total_length);
+fprintf('   Total launcher length ............ %.2f m\n', ...
+    result.total_length);
+
+fprintf('   Maximum diameter ................. %.2f m\n', ...
+    result.max_diameter);
+
+fprintf('   Propulsion configuration ......... %s | %s | %s\n', ...
+    result.prop1.name, ...
+    result.prop2.name, ...
+    result.prop3.name);
 
 fprintf('\n');
-fprintf('=========================================================\n');
+fprintf('==========================================================================\n');
 
 end

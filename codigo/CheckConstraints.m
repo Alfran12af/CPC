@@ -1,84 +1,63 @@
 function valid = CheckConstraints( ...
                     solution, ...
                     architecture)
+% CHECKCONSTRAINTS Verifies launcher feasibility constraints
+%
+% INPUTS:
+%   solution     : evaluated launcher solution
+%   architecture : launcher architecture structure
+%
+% OUTPUT:
+%   valid        : feasibility flag
+
+%% Initialization
 
 valid = true;
 
-%% =========================================================
-%% POSITIVE MASS
-%% =========================================================
+%% Mass and payload checks
 
 if solution.m0 <= 0
-
     valid = false;
     return;
-
 end
 
-%% =========================================================
-%% PAYLOAD FRACTION
-%% =========================================================
-
-if solution.payload_fraction < ...
-        architecture.min_payload_fraction
-
+if solution.payload_fraction < architecture.min_payload_fraction
     valid = false;
     return;
-
 end
 
-%% =========================================================
-%% TOTAL LENGTH
-%% =========================================================
+%% Global geometry checks
 
-if solution.total_length > ...
-        architecture.max_length
-
+if solution.total_length > architecture.max_length
     valid = false;
     return;
-
 end
 
-%% =========================================================
-%% MAXIMUM DIAMETER
-%% =========================================================
-
-if solution.max_diameter > ...
-        architecture.max_diameter
-
+if solution.max_diameter > architecture.max_diameter
     valid = false;
     return;
-
 end
 
-%% =========================================================
-%% GLOBAL SLENDERNESS
-%% =========================================================
-
-if solution.global_slenderness > ...
-        architecture.global_slenderness_max
-
+if solution.global_slenderness > architecture.global_slenderness_max
     valid = false;
     return;
-
 end
 
-%% =========================================================
-%% DIAMETER CASCADE
-%% =========================================================
+%% Diameter compatibility
 
-if solution.geom2.D > solution.geom1.D
+D = [ ...
+    solution.geom1.D ...
+    solution.geom2.D ...
+    solution.geom3.D ];
 
+if any(diff(D) > 0)
     valid = false;
     return;
-
 end
 
-if solution.geom3.D > solution.geom2.D
-
+if any(D(2:end) ./ D(1:end-1) < architecture.diameter_decay_min)
     valid = false;
     return;
-
 end
 
 end

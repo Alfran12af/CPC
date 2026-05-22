@@ -1,273 +1,67 @@
 function params = SetParams()
-% SETPARAMS Defines optimization parameters
+% SETPARAMS Optimization and sizing parameters
 %
 % OUTPUT:
-%   params : optimization settings structure
-%
-% DESCRIPTION:
-%
-%   Contains:
-%
-%   - physical constants
-%   - Delta-V search space
-%   - numerical settings
-%   - geometric assumptions
-%   - solver configuration
-%
+%   params : optimization parameter structure
 
-%% =========================================================
-%% PHYSICAL CONSTANTS
-%% =========================================================
+%% Physical constants
 
-params.g0 = 9.81;          % Standard gravity [m/s^2]
+% Standard gravity [m/s^2]
+params.g0 = 9.81;
 
-%% =========================================================
-%% DELTA-V DISTRIBUTION SEARCH SPACE
-%% =========================================================
-%
-% f1 + f2 + f3 = 1
-%
-% Typical launcher distributions:
-%
-%   Stage 1 -> 40-60%
-%   Stage 2 -> 20-40%
-%   Stage 3 -> remaining
-%
-% ==========================================================
+%% Delta-V distribution
 
+% Stage 1 Delta-V fraction search space [-]
 params.frac1_range = ...
-    linspace(0.4,0.6,20);
+    linspace(0.55, 0.70, 20);
 
-params.frac2_range = ...
-    linspace(0.3,0.5,20);
+%% Stage aspect ratios
 
-%% =========================================================
-%% GEOMETRIC ASSUMPTIONS
-%% =========================================================
-%
-% Preliminary stage geometry assumptions
-%
+% Stage 1 aspect ratio [-]
+params.AR_stage1 = 4.5;
 
-%% =========================================================
-%% STAGE ASPECT RATIOS
-%% =========================================================
-%
-% Preliminary geometric assumptions
-%
+% Stage 2 aspect ratio [-]
+params.AR_stage2 = 5.5;
 
-params.AR_stage1 = 4.5; %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Stage 3 aspect ratio [-]
+params.AR_stage3 = 7.0;
 
-params.AR_stage2 = 5.5; %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Volumetric efficiencies
 
-params.AR_stage3 = 7.0; %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Solid propulsion volumetric efficiency [-]
+params.solid_volumetric_efficiency = 0.90;
 
-%% ---------------------------------------------------------
-%% VOLUMETRIC EFFICIENCY
-%% ---------------------------------------------------------
-%
-% Accounts for:
-%
-%   - insulation
-%   - internal structures
-%   - residual propellant
-%   - pressurization margins
-%
+% Liquid propulsion volumetric efficiency [-]
+params.liquid_volumetric_efficiency = 0.90;
 
-params.solid_volumetric_efficiency = 0.9;
+%% Geometric correlations
 
-params.liquid_volumetric_efficiency = 0.9;
+% Solid engine geometric factor [-]
+params.solid_engine_factor = 0.30;
 
-%% =========================================================
-%% ENGINE SECTION CORRELATIONS
-%% =========================================================
-%
-% Preliminary geometric estimations
-%
+% Liquid engine geometric factor [-]
+params.liquid_engine_factor = 1.00;
 
-%% ---------------------------------------------------------
-%% SOLID MOTORS
-%% ---------------------------------------------------------
+% Nozzle geometric factor [-]
+params.nozzle_factor = 0.60;
 
-params.solid_engine_factor = 0.3;
+% Interstage geometric factor [-]
+params.interstage_factor = 0.50;
 
-%% ---------------------------------------------------------
-%% LIQUID ENGINES
-%% ---------------------------------------------------------
+%% Numerical settings
 
-params.liquid_engine_factor = 1.0;
-
-%% ---------------------------------------------------------
-%% NOZZLE SECTION
-%% ---------------------------------------------------------
-
-params.nozzle_factor = 0.6;
-
-%% ---------------------------------------------------------
-%% INTERSTAGE SECTION
-%% ---------------------------------------------------------
-
-params.interstage_factor = 0.5;
-
-%% =========================================================
-%% NUMERICAL SETTINGS
-%% =========================================================
-
+% Maximum number of stored solutions [-]
 params.max_solutions = 1000;
 
-params.verbose = true;
+%% Target thrust-to-weight ratios
 
-%% =========================================================
-%% CONVERGENCE TOLERANCES
-%% =========================================================
-
-params.mass_tolerance = 1e-6;
-
-params.geometry_tolerance = 1e-6;
-
-%% =========================================================
-%% TARGET THRUST-TO-WEIGHT RATIOS
-%% =========================================================
-%
-% Preliminary propulsion assumptions
-%
-% Typical launcher values:
-%
-%   Stage 1 -> 1.2 - 1.6
-%   Stage 2 -> 0.7 - 1.2
-%   Stage 3 -> 0.3 - 0.8
-%
-
+% Stage 1 target thrust-to-weight ratio [-]
 params.TW_stage1 = 1.4;
 
-params.TW_stage2 = 1;
+% Stage 2 target thrust-to-weight ratio [-]
+params.TW_stage2 = 1.0;
 
+% Stage 3 target thrust-to-weight ratio [-]
 params.TW_stage3 = 0.7;
-
-%% =========================================================
-%% DISPLAY SUMMARY
-%% =========================================================
-
-fprintf('\n');
-fprintf('=========================================================\n');
-fprintf('                OPTIMIZATION PARAMETERS                 \n');
-fprintf('=========================================================\n');
-
-%% ---------------------------------------------------------
-%% DELTA-V SEARCH SPACE
-%% ---------------------------------------------------------
-
-fprintf('\n');
-fprintf('---------------- DELTA-V SEARCH SPACE -------------------\n');
-
-fprintf('\n');
-fprintf('   Stage 1 fractions ........... %d values\n', ...
-        length(params.frac1_range));
-
-fprintf('   Stage 2 fractions ........... %d values\n', ...
-        length(params.frac2_range));
-
-fprintf('   Total combinations .......... %d\n', ...
-        length(params.frac1_range) * ...
-        length(params.frac2_range));
-
-fprintf('\n');
-fprintf('   Stage 1 range ............... %.2f -> %.2f\n', ...
-        min(params.frac1_range), ...
-        max(params.frac1_range));
-
-fprintf('   Stage 2 range ............... %.2f -> %.2f\n', ...
-        min(params.frac2_range), ...
-        max(params.frac2_range));
-
-%% ---------------------------------------------------------
-%% GEOMETRIC PARAMETERS
-%% ---------------------------------------------------------
-
-fprintf('\n');
-fprintf('--------------- GEOMETRIC PARAMETERS --------------------\n');
-
-fprintf('\n');
-fprintf('Stage 1 AR ........... %.2f\n', ...
-        params.AR_stage1);
-
-fprintf('Stage 2 AR ........... %.2f\n', ...
-        params.AR_stage2);
-
-fprintf('Stage 3 AR ........... %.2f\n', ...
-        params.AR_stage3);
-
-fprintf('   Solid volumetric efficiency . %.2f\n', ...
-        params.solid_volumetric_efficiency);
-
-fprintf('   Liquid volumetric efficiency  %.2f\n', ...
-        params.liquid_volumetric_efficiency);
-
-%% ---------------------------------------------------------
-%% ENGINE CORRELATIONS
-%% ---------------------------------------------------------
-
-fprintf('\n');
-fprintf('---------------- ENGINE CORRELATIONS --------------------\n');
-
-fprintf('\n');
-fprintf('   Solid engine factor ......... %.2f\n', ...
-        params.solid_engine_factor);
-
-fprintf('   Liquid engine factor ........ %.2f\n', ...
-        params.liquid_engine_factor);
-
-fprintf('   Nozzle factor ............... %.2f\n', ...
-        params.nozzle_factor);
-
-fprintf('   Interstage factor ........... %.2f\n', ...
-        params.interstage_factor);
-
-%% ---------------------------------------------------------
-%% PROPULSION TARGETS
-%% ---------------------------------------------------------
-
-fprintf('\n');
-fprintf('---------------- PROPULSION TARGETS ---------------------\n');
-
-fprintf('\n');
-fprintf('   Target T/W Stage 1 .......... %.2f\n', ...
-        params.TW_stage1);
-
-fprintf('   Target T/W Stage 2 .......... %.2f\n', ...
-        params.TW_stage2);
-
-fprintf('   Target T/W Stage 3 .......... %.2f\n', ...
-        params.TW_stage3);
-
-%% ---------------------------------------------------------
-%% NUMERICAL SETTINGS
-%% ---------------------------------------------------------
-
-fprintf('\n');
-fprintf('---------------- NUMERICAL SETTINGS ---------------------\n');
-
-fprintf('\n');
-fprintf('   Maximum solutions ........... %d\n', ...
-        params.max_solutions);
-
-fprintf('   Verbose mode ................ %d\n', ...
-        params.verbose);
-
-%% ---------------------------------------------------------
-%% CONVERGENCE TOLERANCES
-%% ---------------------------------------------------------
-
-fprintf('\n');
-fprintf('-------------- CONVERGENCE TOLERANCES -------------------\n');
-
-fprintf('\n');
-fprintf('   Mass tolerance .............. %.2e\n', ...
-        params.mass_tolerance);
-
-fprintf('   Geometry tolerance .......... %.2e\n', ...
-        params.geometry_tolerance);
-
-fprintf('\n');
-fprintf('=========================================================\n');
 
 end

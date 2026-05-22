@@ -5,31 +5,22 @@ function solution = EvaluateConfiguration( ...
                     params)
 % EVALUATECONFIGURATION Evaluates launcher configuration
 %
-% DESCRIPTION:
+% INPUTS:
+%   candidate    : launcher candidate
+%   mission      : mission data
+%   architecture : launcher architecture
+%   params       : optimization parameters
 %
-%   PHASE 1 -> Vehicle sizing
-%       - Tsiolkovsky
-%       - stage masses
-%       - geometry
-%
-%   PHASE 2 -> Propulsion sizing
-%       - thrust
-%       - mass flow
-%       - burn time
-%
-% ==========================================================
+% OUTPUT:
+%   solution     : evaluated launcher solution
 
-%% =========================================================
-%% INITIALIZATION
-%% =========================================================
+%% Initialization
 
 solution.valid = false;
 
 g0 = params.g0;
 
-%% =========================================================
-%% EXTRACT CANDIDATE
-%% =========================================================
+%% Candidate data
 
 DV = candidate.DV;
 
@@ -41,34 +32,31 @@ eps1 = candidate.eps1;
 eps2 = candidate.eps2;
 eps3 = candidate.eps3;
 
-%% =========================================================
-%% ISP SELECTION
-%% =========================================================
+%% Specific impulse selection
 
-Isp1 = prop1.Isp_SL;
+Isp1 = GetEffectiveIsp( ...
+            prop1.Isp_SL, ...
+            prop1.Isp_vac, ...
+            10000);
 
-Isp2 = 0.5 * ...
-       (prop2.Isp_SL + prop2.Isp_vac);
+Isp2 = 0.95 * prop2.Isp_vac;
 
 Isp3 = prop3.Isp_vac;
 
-Isp = [Isp1 Isp2 Isp3];
+Isp = [ ...
+    Isp1 ...
+    Isp2 ...
+    Isp3 ];
 
-%% =========================================================
-%% MASS RATIOS
-%% =========================================================
+%% Mass ratios
 
 mr = exp(DV ./ (g0 .* Isp));
 
-%% =========================================================
-%% PAYLOAD
-%% =========================================================
+%% Payload
 
 payload = mission.m_payload;
 
-%% =========================================================
-%% STAGE 3
-%% =========================================================
+%% Stage 3 sizing (orbital insertion stage)
 
 stage3 = StageMass( ...
             mr(3), ...
@@ -79,9 +67,7 @@ if ~stage3.valid
     return;
 end
 
-%% =========================================================
-%% STAGE 2
-%% =========================================================
+%% Stage 2 sizing (main ascent liquid stage)
 
 stage2 = StageMass( ...
             mr(2), ...
@@ -92,9 +78,7 @@ if ~stage2.valid
     return;
 end
 
-%% =========================================================
-%% STAGE 1
-%% =========================================================
+%% Stage 1 sizing (solid booster)
 
 stage1 = StageMass( ...
             mr(1), ...
@@ -105,15 +89,11 @@ if ~stage1.valid
     return;
 end
 
-%% =========================================================
-%% INITIAL MASS
-%% =========================================================
+%% Lift-off mass
 
 m0 = stage1.mi;
 
-%% =========================================================
-%% STAGE GEOMETRY
-%% =========================================================
+%% Stage geometry
 
 geom1 = StageGeometry( ...
             stage1, ...
@@ -133,14 +113,12 @@ geom3 = StageGeometry( ...
             architecture.stage(3), ...
             params);
 
-%% =========================================================
-%% VEHICLE GEOMETRY
-%% =========================================================
+%% Global geometry
 
 total_length = ...
-    geom1.total_length + ...
-    geom2.total_length + ...
-    geom3.total_length;
+      geom1.total_length ...
+    + geom2.total_length ...
+    + geom3.total_length;
 
 max_diameter = max([ ...
     geom1.D ...
@@ -150,16 +128,12 @@ max_diameter = max([ ...
 global_slenderness = ...
     total_length / max_diameter;
 
-%% =========================================================
-%% PAYLOAD FRACTION
-%% =========================================================
+%% Payload fraction
 
 payload_fraction = ...
     mission.m_payload / m0;
 
-%% =========================================================
-%% PROPULSION SIZING
-%% =========================================================
+%% Propulsion sizing
 
 engine1 = EngineSizing( ...
                 stage1, ...
@@ -182,15 +156,9 @@ engine3 = EngineSizing( ...
                 params.TW_stage3, ...
                 params);
 
-%% =========================================================
-%% STORE RESULTS
-%% =========================================================
+%% Store solution
 
 solution.valid = true;
-
-%% ---------------------------------------------------------
-%% PERFORMANCE
-%% ---------------------------------------------------------
 
 solution.m0 = m0;
 
@@ -203,17 +171,13 @@ solution.mr = mr;
 solution.payload_fraction = ...
     payload_fraction;
 
-%% ---------------------------------------------------------
-%% STAGES
-%% ---------------------------------------------------------
+%% Stage data
 
 solution.stage1 = stage1;
 solution.stage2 = stage2;
 solution.stage3 = stage3;
 
-%% ---------------------------------------------------------
-%% GEOMETRY
-%% ---------------------------------------------------------
+%% Geometry data
 
 solution.geom1 = geom1;
 solution.geom2 = geom2;
@@ -226,28 +190,22 @@ solution.max_diameter = max_diameter;
 solution.global_slenderness = ...
     global_slenderness;
 
-%% ---------------------------------------------------------
-%% PROPELLANTS
-%% ---------------------------------------------------------
+%% Propellant data
 
 solution.prop1 = prop1;
 solution.prop2 = prop2;
 solution.prop3 = prop3;
 
-%% ---------------------------------------------------------
-%% ENGINES
-%% ---------------------------------------------------------
+%% Engine data
 
 solution.engine1 = engine1;
 solution.engine2 = engine2;
 solution.engine3 = engine3;
 
-%% =========================================================
-%% FINAL CONSTRAINT CHECK
-%% =========================================================
+%% Final constraints
 
 solution.valid = CheckConstraints( ...
-                    solution, ...
-                    architecture);
+                     solution, ...
+                     architecture);
 
 end

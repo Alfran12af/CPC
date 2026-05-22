@@ -4,34 +4,17 @@ function valid = CheckMotorCompatibility( ...
 % CHECKMOTORCOMPATIBILITY Validates propulsion compatibility
 %
 % INPUTS:
-%   motor_type : stage motor type
-%   prop       : propellant structure
+%   motor_type : propulsion system type
+%   prop       : propellant property structure
 %
 % OUTPUT:
 %   valid      : compatibility flag
-%
-% DESCRIPTION:
-%
-%   Checks whether a propellant combination
-%   is compatible with the selected
-%   propulsion system.
-%
-% ==========================================================
 
-%% =========================================================
-%% INITIALIZATION
-%% =========================================================
+%% Initialization
 
 valid = false;
 
-%% =========================================================
-%% SINGLE STRING CASE
-%% =========================================================
-%
-% Example:
-%
-%   'solid'
-%
+%% Single compatibility
 
 if ischar(prop.compatible_motor)
 
@@ -43,17 +26,7 @@ if ischar(prop.compatible_motor)
 
 end
 
-%% =========================================================
-%% MULTIPLE COMPATIBILITY CASE
-%% =========================================================
-%
-% Example:
-%
-%   {
-%       'pressure-fed',
-%       'pump-fed'
-%   }
-%
+%% Multiple compatibility
 
 if iscell(prop.compatible_motor)
 

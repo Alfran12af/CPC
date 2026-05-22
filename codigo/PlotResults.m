@@ -1,43 +1,35 @@
 function PlotResults(sol)
-% PLOTRESULTS Generates preliminary launcher plots
+% PLOTRESULTS Generates preliminary launcher figures
 %
 % INPUT:
-%   sol : optimal launcher solution
-%
-% DESCRIPTION:
-%
-%   Generates:
-%
-%   1) Delta-V distribution
-%   2) Mass breakdown
-%   3) Stage geometry comparison
-%   4) Launcher side view
-%
-% ==========================================================
+%   sol : optimal solution structure
 
-fprintf('\nGenerating plots...\n');
+fprintf('\n');
+fprintf('==========================================================================\n');
+fprintf('                           GENERATING FIGURES                             \n');
+fprintf('==========================================================================\n');
 
-%% =========================================================
-%% 1. DELTA-V DISTRIBUTION
-%% =========================================================
+%% ------------------------------------------------------------------------
+% Delta-V distribution
+% -------------------------------------------------------------------------
 
 figure('Name','Delta-V Distribution');
 
 bar(sol.DV);
 
 grid on;
+box on;
 
 xlabel('Stage');
-
 ylabel('\DeltaV [m/s]');
 
 title('Launcher Delta-V Distribution');
 
-xticklabels({'Stage 1','Stage 2','Stage 3'});
+xticklabels({'Booster','Stage 2','Orbital Stage'});
 
-%% =========================================================
-%% 2. MASS BREAKDOWN
-%% =========================================================
+%% ------------------------------------------------------------------------
+% Mass breakdown
+% -------------------------------------------------------------------------
 
 figure('Name','Mass Breakdown');
 
@@ -58,14 +50,14 @@ mass_matrix = [
 bar(mass_matrix,'stacked');
 
 grid on;
+box on;
 
 xlabel('Stage');
-
 ylabel('Mass [kg]');
 
 title('Launcher Mass Breakdown');
 
-xticklabels({'Stage 1','Stage 2','Stage 3'});
+xticklabels({'Booster','Stage 2','Orbital Stage'});
 
 legend( ...
     'Propellant', ...
@@ -73,9 +65,9 @@ legend( ...
     'Upper Stage / Payload', ...
     'Location','best');
 
-%% =========================================================
-%% 3. STAGE GEOMETRY COMPARISON
-%% =========================================================
+%% ------------------------------------------------------------------------
+% Geometry comparison
+% -------------------------------------------------------------------------
 
 figure('Name','Stage Geometry');
 
@@ -98,6 +90,7 @@ subplot(3,1,1)
 bar(geometry_matrix(:,1));
 
 grid on;
+box on;
 
 ylabel('Diameter [m]');
 
@@ -110,6 +103,7 @@ subplot(3,1,2)
 bar(geometry_matrix(:,2));
 
 grid on;
+box on;
 
 ylabel('Length [m]');
 
@@ -122,32 +116,30 @@ subplot(3,1,3)
 bar(geometry_matrix(:,3));
 
 grid on;
+box on;
 
-ylabel('L/D');
+ylabel('Aspect Ratio [-]');
 
 title('Stage Aspect Ratios');
 
 xticklabels({'S1','S2','S3'});
 
-%% =========================================================
-%% 4. VERTICAL LAUNCHER VIEW
-%% =========================================================
+%% ------------------------------------------------------------------------
+% Launcher side view
+% -------------------------------------------------------------------------
 
 figure('Name','Launcher Geometry');
 
 hold on;
+
 axis equal;
 grid on;
+box on;
 
 title('Preliminary Launcher Geometry');
 
 xlabel('Radius [m]');
-
 ylabel('Height [m]');
-
-%% =========================================================
-%% STAGE DATA
-%% =========================================================
 
 D1 = sol.geom1.D;
 D2 = sol.geom2.D;
@@ -157,71 +149,55 @@ L1 = sol.geom1.total_length;
 L2 = sol.geom2.total_length;
 L3 = sol.geom3.total_length;
 
-%% =========================================================
-%% STAGE 1
-%% =========================================================
-
 y1 = 0;
-
-rectangle( ...
-    'Position', ...
-    [-D1/2 y1 D1 L1], ...
-    'FaceColor',[0.8 0.2 0.2]);
-
-%% =========================================================
-%% STAGE 2
-%% =========================================================
-
 y2 = L1;
-
-rectangle( ...
-    'Position', ...
-    [-D2/2 y2 D2 L2], ...
-    'FaceColor',[0.2 0.6 0.8]);
-
-%% =========================================================
-%% STAGE 3
-%% =========================================================
-
 y3 = L1 + L2;
 
+%% Booster
+
 rectangle( ...
-    'Position', ...
-    [-D3/2 y3 D3 L3], ...
+    'Position',[-D1/2 y1 D1 L1], ...
+    'FaceColor',[0.8 0.2 0.2]);
+
+%% Stage 2
+
+rectangle( ...
+    'Position',[-D2/2 y2 D2 L2], ...
+    'FaceColor',[0.2 0.6 0.8]);
+
+%% Orbital stage
+
+rectangle( ...
+    'Position',[-D3/2 y3 D3 L3], ...
     'FaceColor',[0.2 0.8 0.4]);
 
-%% =========================================================
-%% FAIRING
-%% =========================================================
+%% Fairing
 
 fairing_length = 1.5 * D3;
 
 y4 = L1 + L2 + L3;
 
 fairing_x = [-D3/2 0 D3/2];
+fairing_y = [y4 y4 + fairing_length y4];
 
-fairing_y = [y4 y4+fairing_length y4];
+fill( ...
+    fairing_x, ...
+    fairing_y, ...
+    [0.7 0.7 0.7]);
 
-fill(fairing_x, ...
-     fairing_y, ...
-     [0.7 0.7 0.7]);
+%% Labels
 
-%% =========================================================
-%% LABELS
-%% =========================================================
-
-text(0,L1/2,'Stage 1', ...
+text(0, L1/2, ...
+    'Booster', ...
     'HorizontalAlignment','center');
 
-text(0,L1 + L2/2,'Stage 2', ...
+text(0, L1 + L2/2, ...
+    'Stage 2', ...
     'HorizontalAlignment','center');
 
-text(0,L1 + L2 + L3/2,'Stage 3', ...
+text(0, L1 + L2 + L3/2, ...
+    'Orbital Stage', ...
     'HorizontalAlignment','center');
-
-%% =========================================================
-%% LIMITS
-%% =========================================================
 
 ylim([0 y4 + fairing_length + 1]);
 
@@ -229,9 +205,9 @@ xlim([-D1 D1]);
 
 hold off;
 
-%% =========================================================
-%% 5. PROPULSION PERFORMANCE
-%% =========================================================
+%% ------------------------------------------------------------------------
+% Propulsion performance
+% -------------------------------------------------------------------------
 
 figure('Name','Propulsion Performance');
 
@@ -240,10 +216,11 @@ subplot(2,1,1)
 bar(sol.Isp);
 
 grid on;
+box on;
 
 ylabel('Isp [s]');
 
-title('Specific Impulse');
+title('Stage Specific Impulse');
 
 xticklabels({'S1','S2','S3'});
 
@@ -252,13 +229,17 @@ subplot(2,1,2)
 bar(sol.mr);
 
 grid on;
+box on;
 
-ylabel('Mass Ratio');
+ylabel('Mass Ratio [-]');
 
 title('Stage Mass Ratios');
 
 xticklabels({'S1','S2','S3'});
 
-fprintf('Plots generated successfully.\n');
+fprintf('   Figure generation status ........... COMPLETED\n');
+
+fprintf('\n');
+fprintf('==========================================================================\n');
 
 end

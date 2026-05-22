@@ -2,210 +2,157 @@ function candidates = GenerateCandidates( ...
                     mission, ...
                     architecture, ...
                     params)
-% GENERATECANDIDATES Generates launcher design space
+% GENERATECANDIDATES Generates launcher design candidates
 %
 % INPUTS:
-%   mission      : mission structure
+%   mission      : mission data
 %   architecture : launcher architecture
-%   params       : optimization settings
+%   params       : optimization parameters
 %
 % OUTPUT:
-%   candidates   : candidate configurations
-%
-% DESCRIPTION:
-%
-%   Generates all valid combinations of:
-%
-%   - Delta-V distributions
-%   - Propellant selections
-%   - Structural fractions
-%
-%   respecting:
-%
-%   - fixed launcher architecture
-%   - propulsion compatibility
-%
-% ==========================================================
+%   candidates   : candidate configuration array
 
-fprintf('\\n');
-fprintf('----------- GENERATING CANDIDATES -----------\\n');
+fprintf('\n');
+fprintf('==========================================================================\n');
+fprintf('                     GENERATING DESIGN SPACE                              \n');
+fprintf('==========================================================================\n');
 
-%% =========================================================
-%% INITIALIZATION
-%% =========================================================
+%% Initialization
 
 counter = 0;
 
 candidates = [];
 
-%% =========================================================
-%% DELTA-V DISTRIBUTIONS
-%% =========================================================
+%% Mission Delta-V
+
+DV3 = mission.DV_insertion;
+
+DV_ascent = mission.DV_ascent;
+
+%% Propellant databases
+
+stage1_candidates = ...
+    architecture.stage(1).candidates;
+
+stage2_candidates = ...
+    architecture.stage(2).candidates;
+
+stage3_candidates = ...
+    architecture.stage(3).candidates;
+
+%% Structural fraction ranges
+
+eps1_range = ...
+    architecture.stage(1).epsilon_range;
+
+eps2_range = ...
+    architecture.stage(2).epsilon_range;
+
+eps3_range = ...
+    architecture.stage(3).epsilon_range;
+
+%% Delta-V distribution loop
 
 for f1 = params.frac1_range
 
-    for f2 = params.frac2_range
+    % Remaining ascent fraction
+    f2 = 1 - f1;
 
-        %% -------------------------------------------------
-        %% REMAINING FRACTION
-        %% -------------------------------------------------
+    if f2 <= 0
+        continue;
+    end
 
-        f3 = 1 - f1 - f2;
+    %% Stage Delta-V allocation
 
-        %% -------------------------------------------------
-        %% INVALID DISTRIBUTION
-        %% -------------------------------------------------
+    DV1 = f1 * DV_ascent;
 
-        if f3 <= 0
+    DV2 = f2 * DV_ascent;
+
+    DV = [DV1 DV2 DV3];
+
+    %% Stage 1
+
+    for i = 1:length(stage1_candidates)
+
+        prop1 = ...
+            PropellantData(stage1_candidates{i});
+
+        if ~CheckMotorCompatibility( ...
+                architecture.stage(1).motor, ...
+                prop1)
 
             continue;
 
         end
 
-        %% -------------------------------------------------
-        %% DELTA-V PER STAGE
-        %% -------------------------------------------------
+        %% Stage 2
 
-        DV = mission.DV_total * [f1 f2 f3] + [mission.DV_drag, 0, mission.DV_insertion];
+        for j = 1:length(stage2_candidates)
 
-        %% =================================================
-        %% PROPELLANT DATABASES
-        %% =================================================
-
-        stage1_candidates = ...
-            architecture.stage(1).candidates;
-
-        stage2_candidates = ...
-            architecture.stage(2).candidates;
-
-        stage3_candidates = ...
-            architecture.stage(3).candidates;
-
-        %% =================================================
-        %% STRUCTURAL FRACTIONS
-        %% =================================================
-
-        eps1_range = ...
-            architecture.stage(1).epsilon_range;
-
-        eps2_range = ...
-            architecture.stage(2).epsilon_range;
-
-        eps3_range = ...
-            architecture.stage(3).epsilon_range;
-
-        %% =================================================
-        %% STAGE 1 LOOP
-        %% =================================================
-
-        for i = 1:length(stage1_candidates)
-
-            %% ---------------------------------------------
-            %% LOAD PROPELLANT
-            %% ---------------------------------------------
-
-            prop1 = ...
-                PropellantData(stage1_candidates{i});
-
-            %% ---------------------------------------------
-            %% CHECK COMPATIBILITY
-            %% ---------------------------------------------
+            prop2 = ...
+                PropellantData(stage2_candidates{j});
 
             if ~CheckMotorCompatibility( ...
-                    architecture.stage(1).motor, ...
-                    prop1)
+                    architecture.stage(2).motor, ...
+                    prop2)
 
                 continue;
 
             end
 
-            %% =================================================
-            %% STAGE 2 LOOP
-            %% =================================================
+            %% Stage 3
 
-            for j = 1:length(stage2_candidates)
+            for k = 1:length(stage3_candidates)
 
-                prop2 = ...
-                    PropellantData(stage2_candidates{j});
-
-                %% ---------------------------------------------
-                %% CHECK COMPATIBILITY
-                %% ---------------------------------------------
+                prop3 = ...
+                    PropellantData(stage3_candidates{k});
 
                 if ~CheckMotorCompatibility( ...
-                        architecture.stage(2).motor, ...
-                        prop2)
+                        architecture.stage(3).motor, ...
+                        prop3)
 
                     continue;
 
                 end
 
-                %% =================================================
-                %% STAGE 3 LOOP
-                %% =================================================
+                %% Structural fractions
 
-                for k = 1:length(stage3_candidates)
+                for e1 = 1:length(eps1_range)
 
-                    prop3 = ...
-                        PropellantData(stage3_candidates{k});
+                    eps1 = eps1_range(e1);
 
-                    %% ---------------------------------------------
-                    %% CHECK COMPATIBILITY
-                    %% ---------------------------------------------
+                    for e2 = 1:length(eps2_range)
 
-                    if ~CheckMotorCompatibility( ...
-                            architecture.stage(3).motor, ...
-                            prop3)
+                        eps2 = eps2_range(e2);
 
-                        continue;
+                        for e3 = 1:length(eps3_range)
 
-                    end
+                            eps3 = eps3_range(e3);
 
-                    %% =============================================
-                    %% EPSILON LOOPS
-                    %% =============================================
+                            %% Store candidate
 
-                    for e1 = 1:length(eps1_range)
+                            counter = counter + 1;
 
-                        eps1 = eps1_range(e1);
+                            candidates(counter).DV = DV;
 
-                        for e2 = 1:length(eps2_range)
+                            candidates(counter).f1 = f1;
 
-                            eps2 = eps2_range(e2);
+                            candidates(counter).f2 = f2;
 
-                            for e3 = 1:length(eps3_range)
+                            candidates(counter).f3 = ...
+                                DV3 / (DV_ascent + DV3);
 
-                                eps3 = eps3_range(e3);
+                            candidates(counter).prop1 = prop1;
 
-                                %% =====================================
-                                %% STORE CANDIDATE
-                                %% =====================================
+                            candidates(counter).prop2 = prop2;
 
-                                counter = counter + 1;
+                            candidates(counter).prop3 = prop3;
 
-                                candidates(counter).DV = DV;
+                            candidates(counter).eps1 = eps1;
 
-                                %% -------------------------------------
-                                %% PROPELLANTS
-                                %% -------------------------------------
+                            candidates(counter).eps2 = eps2;
 
-                                candidates(counter).prop1 = prop1;
-
-                                candidates(counter).prop2 = prop2;
-
-                                candidates(counter).prop3 = prop3;
-
-                                %% -------------------------------------
-                                %% STRUCTURAL FRACTIONS
-                                %% -------------------------------------
-
-                                candidates(counter).eps1 = eps1;
-
-                                candidates(counter).eps2 = eps2;
-
-                                candidates(counter).eps3 = eps3;
-
-                            end
+                            candidates(counter).eps3 = eps3;
 
                         end
 
@@ -221,11 +168,56 @@ for f1 = params.frac1_range
 
 end
 
-%% =========================================================
-%% DISPLAY SUMMARY
-%% =========================================================
+%% Design space summary
 
-fprintf('Valid candidates generated : %d\\n', ...
-        counter);
+fprintf('\n');
+fprintf('DESIGN SPACE SUMMARY\n');
+fprintf('--------------------------------------------------------------------------\n');
+
+fprintf('   Total candidate configurations .... %d\n', ...
+    counter);
+
+fprintf('\n');
+fprintf('DELTA-V DISTRIBUTION\n');
+fprintf('--------------------------------------------------------------------------\n');
+
+fprintf('   Stage 1 ascent fraction ........... %.2f - %.2f\n', ...
+    min(params.frac1_range), ...
+    max(params.frac1_range));
+
+fprintf('   Fixed insertion Delta-V ........... %.2f m/s\n', ...
+    DV3);
+
+fprintf('\n');
+fprintf('PROPULSION COMBINATIONS\n');
+fprintf('--------------------------------------------------------------------------\n');
+
+fprintf('   Stage 1 candidates ................ %d\n', ...
+    length(stage1_candidates));
+
+fprintf('   Stage 2 candidates ................ %d\n', ...
+    length(stage2_candidates));
+
+fprintf('   Stage 3 candidates ................ %d\n', ...
+    length(stage3_candidates));
+
+fprintf('\n');
+fprintf('STRUCTURAL FRACTION RANGES\n');
+fprintf('--------------------------------------------------------------------------\n');
+
+fprintf('   epsilon_1 ......................... %.2f - %.2f\n', ...
+    min(eps1_range), ...
+    max(eps1_range));
+
+fprintf('   epsilon_2 ......................... %.2f - %.2f\n', ...
+    min(eps2_range), ...
+    max(eps2_range));
+
+fprintf('   epsilon_3 ......................... %.2f - %.2f\n', ...
+    min(eps3_range), ...
+    max(eps3_range));
+
+fprintf('\n');
+fprintf('==========================================================================\n');
 
 end
