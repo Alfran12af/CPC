@@ -20,12 +20,12 @@ case 'HTPB_AN_Al'
 
     prop.OF = NaN;
 
-    prop.Isp_SL  = 251.11;
-    prop.Isp_vac = 274.37;
+    prop.Isp_SL  = 267.05;
+    prop.Isp_vac = 279.41;
 
-    prop.Tc    = 2618.8714;
-    prop.gamma = 1.1856;
-    prop.MW    = 23.4985;
+    prop.Tc    = 2624.4763;
+    prop.gamma = 1.1876;
+    prop.MW    = 23.5188;
 
     prop.compatible_motor = 'solid';
 
@@ -133,18 +133,18 @@ case 'LOX_RP1_3'
     prop.rho_fuel = 810;
     prop.rho_ox   = 1141;
 
-    prop.OF = 2.8499545;
+    prop.OF = 2.8607767;
 
     prop.rho_eff = ...
         (prop.OF + 1) / ...
         (prop.OF / prop.rho_ox + 1 / prop.rho_fuel);
 
-    prop.Isp_SL  = 245.44;
-    prop.Isp_vac = 374.39;
+    prop.Isp_SL  = 257.71;
+    prop.Isp_vac = 374.78;
 
-    prop.Tc    = 3753.7615;
+    prop.Tc    = 3782.5154;
     prop.gamma = 1.1886;
-    prop.MW    = 24.4194;
+    prop.MW    = 24.5172;
 
     prop.compatible_motor = {'pump-fed'};
 
@@ -156,18 +156,18 @@ case 'LOX_CH4_3'
     prop.rho_fuel = 422;
     prop.rho_ox   = 1141;
 
-    prop.OF = 3.4742122;
+    prop.OF = 3.4839966;
 
     prop.rho_eff = ...
         (prop.OF + 1) / ...
         (prop.OF / prop.rho_ox + 1 / prop.rho_fuel);
 
-    prop.Isp_SL  = 253.79;
-    prop.Isp_vac = 385.00;
+    prop.Isp_SL  = 266.28;
+    prop.Isp_vac = 385.32;
 
-    prop.Tc    = 3605.2600;
-    prop.gamma = 1.1750;
-    prop.MW    = 21.9711;
+    prop.Tc    = 3630.5004;
+    prop.gamma = 1.1749;
+    prop.MW    = 22.0501;
 
     prop.compatible_motor = {'pump-fed'};
 
@@ -179,18 +179,18 @@ case 'LOX_LH2'
     prop.rho_fuel = 71;
     prop.rho_ox   = 1141;
 
-    prop.OF = 5.5000;
+    prop.OF = 5.0622139;
 
     prop.rho_eff = ...
         (prop.OF + 1) / ...
         (prop.OF / prop.rho_ox + 1 / prop.rho_fuel);
 
-    prop.Isp_SL  = 243.26;
-    prop.Isp_vac = 362.84;
+    prop.Isp_SL  = 333.33;
+    prop.Isp_vac = 469.45;
 
-    prop.Tc    = 3523.6766;
-    prop.gamma = 1.1583;
-    prop.MW    = 21.1639;
+    prop.Tc    = 3338.4071;
+    prop.gamma = 1.1734;
+    prop.MW    = 11.9721;
 
     prop.compatible_motor = {'pump-fed'};
 
